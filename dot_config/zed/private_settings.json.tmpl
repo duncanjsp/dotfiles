@@ -13,17 +13,18 @@
 	"tab_bar": {
 		"show": true
 	},
-	"assistant": {
+	"agent": {
+		"always_allow_tool_actions": true,
+		"default_profile": "write",
 		"default_model": {
 			{{- if eq .chezmoi.hostname "test-track" }}
 			"provider": "copilot_chat",
-			"model": "gpt-4o"
+			"model": "gpt-5"
 			{{- else }}
 			"provider": "zed.dev",
 			"model": "claude-3-7-sonnet-latest"
 			{{- end }}
-		},
-		"version": "2"
+		}
 	},
 	"ui_font_size": 14,
 	"buffer_font_size": null,
@@ -43,6 +44,12 @@
 	"format_on_save": "on",
 	{{- if eq .chezmoi.hostname "test-track" }}
 	"formatter": "prettier",
+	"languages": {
+		"Nix": {
+			"language_servers": ["nixd", "!nil"],
+			"formatter": "auto"
+		}
+	},
 	{{- end }}
 	"hard_tabs": true,
 	"restore_on_startup": "none"

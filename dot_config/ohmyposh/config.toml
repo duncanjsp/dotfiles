@@ -115,7 +115,7 @@ fetch_package_manager = false
 home_enabled = false
 
 [[blocks.segments]]
-template = ' '
+template = ' '
 foreground = 'p:blue'
 background = 'transparent'
 type = 'go'
@@ -149,6 +149,13 @@ foreground = 'p:white'
 background = 'transparent'
 type = 'shell'
 style = 'plain'
+
+[[blocks.segments]]
+type = "nix-shell"
+style = "powerline"
+foreground = "p:blue"
+background = "transparent"
+template = "󱄅 "
 
 [[blocks.segments]]
 template = 'at <p:blue><b>{{ .CurrentDate | date "15:04:05" }}</b></>'
