@@ -29,3 +29,8 @@ export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/config
 export NPM_CONFIG_CACHE=$XDG_CACHE_HOME/npm
 
 export LESSHISTFILE="$XDG_DATA_HOME/less/lesshst"
+{{- if ne .chezmoi.hostname "test-track" }}
+
+export GOPATH="$XDG_DATA_HOME"/go
+export GOBIN="$XDG_DATA_HOME"/go/bin
+{{- end }}
