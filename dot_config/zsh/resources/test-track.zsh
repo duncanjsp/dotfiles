@@ -12,5 +12,8 @@ alias yarn="op run --account agilebits --no-masking -- yarn"
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 
+# Android crap
+export ANDROID_HOME=$HOME/Library/Android/sdk
+
 # Aliases
 alias cdb5="cd $GOPATH/src/go.1password.io/b5"

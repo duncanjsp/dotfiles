@@ -42,15 +42,17 @@
 	},
 	"show_whitespaces": "boundary",
 	"format_on_save": "on",
-	{{- if eq .chezmoi.hostname "test-track" }}
 	"formatter": "prettier",
 	"languages": {
 		"Nix": {
 			"language_servers": ["nixd", "!nil"],
 			"formatter": "auto"
+		},
+		"Go": {
+			"language_servers": ["gopls"],
+			"formatter": "auto"
 		}
 	},
-	{{- end }}
 	"hard_tabs": true,
 	"restore_on_startup": "none"
 }
