@@ -11,8 +11,9 @@
 	gpgsign = true
 [push]
 	autoSetupRemote = true
-[user]
-	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL2ypgsJT6cu614LIGHPhNEK+l084Txm7SjkMZVPlX0z
+[user]{{ if eq .chezmoi.hostname "test-track" }}
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAEDbXQOIRzbFI6Q3q0RHWVHloBrEcNagqPfk4fhbtsY{{ else }}
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL2ypgsJT6cu614LIGHPhNEK+l084Txm7SjkMZVPlX0z{{ end }}
 	name = Duncan Stevenson-Price
 	email = {{ .email }}
 [core]
