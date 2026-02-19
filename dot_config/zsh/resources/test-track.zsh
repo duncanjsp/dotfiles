@@ -10,6 +10,7 @@ alias yarn="op run --account agilebits --no-masking -- yarn"
 
 # Go Config for server
 export GOPATH=$HOME/go
+export GOPRIVATE="go.1password.io,gitlab.1password.io,proto.1infra.dev,github.com/agilebits-inc"
 export PATH=$PATH:$GOPATH/bin
 
 # Android crap
