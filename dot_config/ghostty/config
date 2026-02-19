@@ -1,6 +1,10 @@
 # Keybindings
 keybind = global:ctrl+space=toggle_quick_terminal
 
+# New terminal config
+window-inherit-working-directory = false
+working-directory = home
+
 # Quick terminal config
 quick-terminal-position = "top"
 quick-terminal-screen = "main"
