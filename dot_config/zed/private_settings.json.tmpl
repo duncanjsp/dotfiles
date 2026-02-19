@@ -1,31 +1,42 @@
 {
+	"edit_predictions": {
+		{{- if eq .chezmoi.hostname "test-track" }}
+		"provider": "copilot"
+		{{- else }}
+		"provider": "zed"
+		{{- end }}
+	},
 	"outline_panel": {
 		"dock": "right"
-	},
-	"features": {
-		{{- if eq .chezmoi.hostname "test-track" }}
-		"edit_prediction_provider": "copilot"
-		{{- else }}
-		"edit_prediction_provider": "zed"
-		{{- end }}
 	},
 	"vim_mode": true,
 	"tab_bar": {
 		"show": true
 	},
 	"agent": {
-		"always_allow_tool_actions": true,
+		"tool_permissions": {
+			"default": "allow"
+		},
 		"default_profile": "write",
 		"default_model": {
 			{{- if eq .chezmoi.hostname "test-track" }}
 			"provider": "copilot_chat",
-			"model": "gpt-5"
+			"model": "gpt-5.2"
 			{{- else }}
 			"provider": "zed.dev",
 			"model": "claude-3-7-sonnet-latest"
 			{{- end }}
 		}
 	},
+	{{- if ne .chezmoi.hostname "test-track" }}
+	"agent_servers": {
+		"codex": {
+			"default_config_options": {
+				"model": "gpt-5.3-codex"
+			}
+		}
+	},
+	{{- end }}
 	"ui_font_size": 14,
 	"buffer_font_size": null,
 	"buffer_font_family": "JetBrainsMono Nerd Font",
@@ -54,5 +65,5 @@
 		}
 	},
 	"hard_tabs": true,
-	"restore_on_startup": "none"
+	"restore_on_startup": "empty_tab"
 }
