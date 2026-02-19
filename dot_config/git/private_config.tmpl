@@ -1,5 +1,13 @@
-{{ if eq .chezmoi.hostname "test-track" }}[url "ssh://git@ssh.gitlab.1password.io:2227"]
-	insteadOf = https://gitlab.1password.io{{ end }}
+{{ if eq .chezmoi.hostname "test-track" }}
+[url "ssh://git@ssh.gitlab.1password.io:2227"]
+	insteadOf = https://gitlab.1password.io
+[url "git@github.com-work:agilebits-inc/"]
+	insteadOf = git@github.com:agilebits-inc/
+[url "git@github.com-work:agilebits-tst-EMU/"]
+	insteadOf = git@github.com:agilebits-tst-EMU/
+[url "git@github.com-personal:"]
+	insteadOf = git@github.com:
+{{ end }}
 [gpg]
 	format = ssh
 [alias]
