@@ -1,15 +1,26 @@
-{{ if eq .chezmoi.hostname "test-track" }}
+{{- if eq .chezmoi.hostname "test-track" }}
+{{- $workOrgs := list "agilebits-inc" "agilebits-tst-EMU" }}
+{{- $workUsers := list "ben-kirby_1pw" "duncan-stevenson_1pw" "riyad-khan_1pw" }}
 [url "ssh://git@ssh.gitlab.1password.io:2227"]
 	insteadOf = https://gitlab.1password.io
-[url "git@github.com-work:agilebits-inc/"]
-	insteadOf = git@github.com:agilebits-inc/
-[url "git@github.com-work:agilebits-tst-EMU/"]
-	insteadOf = git@github.com:agilebits-tst-EMU/
+
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+
+{{ range $workOrgs }}
+[url "git@github.com-work:{{ . }}/"]
+	insteadOf = git@github.com:{{ . }}/
+{{ end }}
+
+{{- range $workUsers }}
+[url "git@github.com-work:{{ . }}/"]
+	insteadOf = git@github.com:{{ . }}/
+{{ end }}
+
 [url "git@github.com-personal:"]
 	insteadOf = git@github.com:
-[url "ssh://git@github.com"]
-	insteadOf = https://github.com
-{{ end }}
+
+{{- end }}
 [gpg]
 	format = ssh
 [alias]
