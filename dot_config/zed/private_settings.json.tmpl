@@ -30,15 +30,16 @@
 	},
 	{{- if ne .chezmoi.hostname "test-track" }}
 	"agent_servers": {
-		"codex": {
+		"codex-acp": {
+			"type": "registry",
 			"default_config_options": {
 				"model": "gpt-5.3-codex"
 			}
 		}
 	},
 	{{- end }}
-	"ui_font_size": 14,
-	"buffer_font_size": null,
+	"ui_font_size": 16,
+	"buffer_font_size": 16,
 	"buffer_font_family": "JetBrainsMono Nerd Font",
 	"tab_size": 3,
 	"theme": {
