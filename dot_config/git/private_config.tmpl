@@ -6,17 +6,16 @@
 
 [url "git@github.com:"]
 	insteadOf = https://github.com/
-
 {{ range $workOrgs }}
 [url "git@github.com-work:{{ . }}/"]
 	insteadOf = git@github.com:{{ . }}/
+	insteadOf = https://github.com/{{ . }}/
 {{ end }}
 
 {{- range $workUsers }}
 [url "git@github.com-work:{{ . }}/"]
 	insteadOf = git@github.com:{{ . }}/
 {{ end }}
-
 [url "git@github.com-personal:"]
 	insteadOf = git@github.com:
 
