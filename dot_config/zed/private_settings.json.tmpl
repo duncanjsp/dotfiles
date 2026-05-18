@@ -1,4 +1,13 @@
 {
+	"project_panel": {
+		"dock": "left"
+	},
+	"collaboration_panel": {
+		"dock": "right"
+	},
+	"git_panel": {
+		"dock": "right"
+	},
 	"edit_predictions": {
 		{{- if eq .chezmoi.hostname "test-track" }}
 		"provider": "copilot"
@@ -14,6 +23,7 @@
 		"show": true
 	},
 	"agent": {
+		"dock": "left",
 		"tool_permissions": {
 			"default": "allow"
 		},

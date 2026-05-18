@@ -49,6 +49,21 @@ final_space = true
     style = 'powerline'
 
   [[blocks.segments]]
+    template = ' jj {{ if .ClosestBookmarks }}{{ .ClosestBookmarks }} {{ end }}{{ .ChangeID }}{{ if .Working.Changed }}  {{ .Working.String }}{{ end }} '
+    foreground = 'p:black'
+    powerline_symbol = ''
+    background = 'p:green'
+    type = 'jujutsu'
+    style = 'powerline'
+    background_templates = ['{{ if .Working.Changed }}p:yellow{{ end }}']
+
+    [blocks.segments.options]
+      fetch_status = true
+      ignore_working_copy = false
+      fetch_ahead_counter = true
+      ahead_icon = '⇡'
+
+  [[blocks.segments]]
     template = ' {{ if .UpstreamURL }}{{ url .UpstreamIcon .UpstreamURL }} {{ end }}{{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }}  {{ .Working.String }}{{ end }}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }} '
     foreground = 'p:black'
     powerline_symbol = ''
@@ -57,6 +72,9 @@ final_space = true
     style = 'powerline'
     foreground_templates = ['{{ if or (.Working.Changed) (.Staging.Changed) }}p:black{{ end }}', '{{ if and (gt .Ahead 0) (gt .Behind 0) }}p:white{{ end }}', '{{ if gt .Ahead 0 }}p:white{{ end }}']
     background_templates = ['{{ if or (.Working.Changed) (.Staging.Changed) }}p:yellow{{ end }}', '{{ if and (gt .Ahead 0) (gt .Behind 0) }}p:red{{ end }}', '{{ if gt .Ahead 0 }}#49416D{{ end }}', '{{ if gt .Behind 0 }}#7A306C{{ end }}']
+
+    [blocks.segments.options]
+      disable_with_jj = true
 
   [[blocks.segments]]
     template = '  '
