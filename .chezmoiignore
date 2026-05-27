@@ -2,3 +2,6 @@ README.md
 {{ if ne .chezmoi.hostname "test-track" }}
 .config/zsh/resources/test-track.zsh
 {{ end }}
+{{ if ne .chezmoi.hostname "fantasmic" }}
+.config/zsh/resources/fantasmic.zsh
+{{ end }}

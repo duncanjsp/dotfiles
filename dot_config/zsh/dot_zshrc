@@ -16,9 +16,6 @@ eval "$(atuin init zsh)"
 # Load Mise https://mise.jdx.dev/
 eval "$(mise activate zsh)"
 
-# Load Orbstack https://orbstack.dev/
-source ~/.orbstack/shell/init.zsh 2>/dev/null || :
-
 # Load supplementary configuration files
 if [ -d "$XDG_CONFIG_HOME/zsh/resources" ]; then
 	for file in "$XDG_CONFIG_HOME/zsh/resources"/*.zsh; do
