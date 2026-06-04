@@ -4,7 +4,8 @@ eval "$(direnv hook zsh)"
 # Stop Direnv moaning about taking ages even though it ALWAYS takes ages when Nix is involved
 export DIRENV_WARN_TIMEOUT=0
 
-# Secrets for yarn
+# GitHub Auth for Packages
+export GITHUB_TOKEN="op://Employee/GitHub Token EMU/password"
 alias yarn="op run --account agilebits --no-masking -- yarn"
 
 # Go Config for server
