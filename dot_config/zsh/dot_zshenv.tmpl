@@ -28,6 +28,8 @@ export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME"/bundle
 export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/config
 export NPM_CONFIG_CACHE=$XDG_CACHE_HOME/npm
 
+export ZELLIJ_SOCKET_DIR="$XDG_STATE_HOME/zellij/sockets"
+
 export LESSHISTFILE="$XDG_DATA_HOME/less/lesshst"
 {{- if ne .chezmoi.hostname "test-track" }}
 
