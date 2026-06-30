@@ -1,0 +1,32 @@
+[ui.toast]
+delivery = "herdr"
+
+[theme]
+name = "dracula"
+auto_switch = false
+
+[experimental]
+pane_history = false
+switch_ascii_input_source_in_prefix = false
+
+[ui]
+show_agent_labels_on_pane_borders = false
+prompt_new_tab_name = false
+
+agent_panel_sort = "spaces"
+[keys]
+prefix = "ctrl+b"
+new_workspace = "prefix+n"
+rename_workspace = "prefix+shift+n"
+close_workspace = "prefix+shift+d"
+new_tab = "prefix+t"
+rename_tab = "prefix+shift+t"
+close_tab = "prefix+shift+w"
+next_workspace = "ctrl+tab"
+previous_workspace = "ctrl+shift+tab"
+next_tab = "ctrl+alt+tab"
+previous_tab = "ctrl+alt+shift+tab"
+
+[keys.indexed]
+workspaces = "ctrl+shift"
+tabs = "alt"

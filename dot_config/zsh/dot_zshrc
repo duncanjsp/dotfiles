@@ -7,6 +7,11 @@ export PATH="$HOME/.local/bin:/opt/homebrew/opt/node@20/bin:$PATH"
 # Default editor
 export EDITOR="zed --wait"
 
+# Launch herdr if not in a herdr session
+if [[ -z "$HERDR_ENV" ]]; then
+	exec herdr || exit
+fi
+
 # OhMyPosh Config https://ohmyposh.dev/docs/
 eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/ohmyposh/config.toml)"
 

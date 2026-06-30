@@ -36,3 +36,5 @@ cursor-color = #7970A9
 cursor-text = #7970A9
 selection-background = #454158
 selection-foreground = #F8F8F2
+
+config-file = ../native-shortcuts-herd/ghostty.conf
