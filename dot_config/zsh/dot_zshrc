@@ -7,15 +7,6 @@ export PATH="$HOME/.local/bin:/opt/homebrew/opt/node@20/bin:$PATH"
 # Default editor
 export EDITOR="zed --wait"
 
-# Launch zellij if not in a zellij session
-if [[ -z "$ZELLIJ" ]]; then
-	if [[ "$ZELLIJ_AUTO_ATTACH" == "true" ]]; then
-		exec zellij attach -c || exit
-	else
-		exec zellij || exit
-	fi
-fi
-
 # OhMyPosh Config https://ohmyposh.dev/docs/
 eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/ohmyposh/config.toml)"
 
