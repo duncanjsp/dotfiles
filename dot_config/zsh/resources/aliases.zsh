@@ -13,3 +13,15 @@ alias gunwip='git rev-list --max-count=1 --format="%s" HEAD | grep -q "\--wip--"
 
 # Attach to herdr on demand
 alias h='herdr'
+
+# Route `chezmoi diff` through revdiff; all other subcommands pass through untouched
+chezmoi() {
+  if [[ "$1" == "diff" ]]; then
+    command chezmoi diff "${@:2}" | revdiff --stdin
+  else
+    command chezmoi "$@"
+  fi
+}
+
+# Claude Sandbox
+alias cs="cd ~/Developer/ai-sandbox && claude"
