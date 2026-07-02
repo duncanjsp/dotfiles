@@ -30,10 +30,13 @@ if [ -d "$XDG_CONFIG_HOME/zsh/resources" ]; then
 	done
 fi
 
-# Better autocomplete
-autoload -Uz compinit && compinit -d "$ZCOMPDUMP"
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'        # case-insensitive completion
-zstyle ':completion:*' menu select                            # menu selection
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"       # color completion
+autoload -U compinit && compinit
+export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
+export CARAPACE_MATCH=1                                # case-insensitive completion
+zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # case-insensitive fallback for non-carapace completions
+zstyle ':completion:*' menu select                     # menu selection
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # color completion
+source <(carapace _carapace)
 
 fastfetch
