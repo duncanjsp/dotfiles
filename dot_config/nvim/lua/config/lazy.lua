@@ -25,13 +25,13 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Configure lazy.nvim.
 --
--- `spec` lists the plugins to manage. It's empty for now (Step 1) so Neovim
--- opens with a working editor and the plugin manager, but zero plugins.
--- In Step 2 we switch this to `{ { import = "plugins" } }`, which tells lazy
--- to load every file in lua/plugins/ -- after that, adding a plugin is just
--- dropping a new file in that folder.
+-- `import = "plugins"` tells lazy to load every *.lua file in lua/plugins/ and
+-- treat each one as a plugin spec. From here on, adding a plugin is simply
+-- dropping a new commented file into that folder -- no wiring needed.
 require("lazy").setup({
-  spec = {},
+  spec = {
+    { import = "plugins" },
+  },
   -- Don't auto-check for plugin updates on startup; run `:Lazy update` yourself.
   checker = { enabled = false },
   change_detection = { notify = false },
