@@ -48,6 +48,15 @@ opt.undofile = true
 opt.splitright = true
 opt.splitbelow = true
 
+-- Folding: use Treesitter to fold by real code structure (functions, blocks)
+-- rather than by indentation. Keys: `za` toggle, `zc`/`zo` close/open,
+-- `zM`/`zR` close-all/open-all. (The foldexpr calls a Treesitter function; on
+-- buffers without a parser it simply yields no folds.)
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldlevel = 99 -- start fully unfolded (a high level means nothing is folded)
+opt.foldtext = ""  -- show the folded line with its normal highlighting
+
 -- Shorter update time -> snappier UI (also controls the which-key popup delay later).
 opt.updatetime = 250
 
