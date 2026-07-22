@@ -1,5 +1,6 @@
 # Set additional XDG Dirs as required
 export HISTFILE=$XDG_DATA_HOME/zsh/history
+[[ -d ${HISTFILE:h} ]] || mkdir -p ${HISTFILE:h}
 
 # Path Configuration
 export PATH="$HOME/.local/bin:/opt/homebrew/opt/node@20/bin:$PATH"
