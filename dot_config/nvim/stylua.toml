@@ -1,0 +1,7 @@
+# stylua config for THIS Neovim config only.
+# Neovim/Lua community convention is 2-space indentation, which is how these
+# files are already written -- so format-on-save leaves them alone rather than
+# converting to tabs. (Your global default in ~/.config/stylua/ is tabs.)
+column_width = 100
+indent_type = "Spaces"
+indent_width = 2
