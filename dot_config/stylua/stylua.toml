@@ -1,0 +1,4 @@
+# Global default (tabs). Project stylua.toml files override this.
+column_width = 100
+indent_type = "Tabs"
+indent_width = 4

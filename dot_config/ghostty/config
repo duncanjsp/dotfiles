@@ -10,6 +10,9 @@ quick-terminal-position = "top"
 quick-terminal-screen = "main"
 quick-terminal-animation-duration = 0.05
 
+# Nerd Font for icon/powerline glyphs.
+font-family = "JetBrainsMono Nerd Font Mono"
+
 # Visuals
 # theme = "dracula"
 # Pro theme configuration
