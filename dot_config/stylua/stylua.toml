@@ -1,6 +1,4 @@
-# Global stylua defaults, used for Lua files whose project has no stylua.toml
-# of its own (stylua finds this via `--search-parent-directories`).
-# Tabs, to match the general indentation preference.
+# Global default (tabs). Project stylua.toml files override this.
 column_width = 100
 indent_type = "Tabs"
 indent_width = 4

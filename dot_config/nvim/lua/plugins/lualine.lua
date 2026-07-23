@@ -1,29 +1,16 @@
--- Lualine: a fast, configurable statusline (the bar at the bottom).
---
--- Shows the current mode, VCS info, diagnostics, filename, filetype (with an
--- icon), and cursor position -- themed to match the colorscheme.
---
--- This config adds a custom Jujutsu (jj) component that mirrors the user's
--- ohmyposh prompt: a source-control icon, the nearest ancestor bookmark with a
--- "⇡N" ahead counter, the short change-id, and the working-copy edit stats
--- (e.g. "  add-nvim⇡5 t   +1"). Outside a jj repo it falls back to the git
--- branch. The value is cached and only refreshed on a few events, so the
--- statusline never shells out to jj on every redraw.
---
--- Repo: https://github.com/nvim-lualine/lualine.nvim
-
+-- https://github.com/nvim-lualine/lualine.nvim
 return {
   "nvim-lualine/lualine.nvim",
-  dependencies = { "nvim-tree/nvim-web-devicons" }, -- icons (already installed)
+  dependencies = { "nvim-tree/nvim-web-devicons" },
   event = "VeryLazy",
-
   config = function()
-    -- ----- Jujutsu (jj) status, cached -----
-    -- Icons built from codepoints via nr2char, so no fragile Private-Use bytes
-    -- live in this file. Change a number to swap a glyph (see nerdfonts.com).
-    local SC_ICON = vim.fn.nr2char(0xe0a0) -- powerline branch (source control)
-    local AHEAD_ICON = vim.fn.nr2char(0x21e1) -- upwards dashed arrow (revisions ahead)
-    local EDIT_ICON = vim.fn.nr2char(0xf040) -- pencil (working copy has edits)
+    -- jj status: nearest bookmark + revisions ahead + short change-id + edit
+    -- stats; falls back to the git branch outside jj repos. Cached, refreshed
+    -- on a few events rather than every redraw. Icons via nr2char to keep the
+    -- source ASCII-clean.
+    local SC_ICON = vim.fn.nr2char(0xe0a0)
+    local AHEAD_ICON = vim.fn.nr2char(0x21e1)
+    local EDIT_ICON = vim.fn.nr2char(0xf040)
 
     local jj = { text = "", is_repo = false }
 
@@ -35,7 +22,6 @@ return {
         return
       end
 
-      -- Run any jj command under this repo; returns stdout, or nil on error.
       local function run(args)
         local cmd = { "jj", "--no-pager", "-R", root }
         vim.list_extend(cmd, args)
@@ -43,9 +29,7 @@ return {
         return (vim.v.shell_error == 0) and out or nil
       end
 
-      -- Edits on the current revision (@). We deliberately DO snapshot here (no
-      -- --ignore-working-copy) so counts reflect files you've saved, like your
-      -- shell prompt does. Summary lines look like "A path" / "M path" / "D path".
+      -- Snapshots (no --ignore-working-copy) so edit counts reflect saved files.
       local added, modified, deleted = 0, 0, 0
       local summary = run({ "diff", "-r", "@", "--summary" })
       if summary then
@@ -61,17 +45,13 @@ return {
         end
       end
 
-      -- Metadata queries. The snapshot above already refreshed repo state, so
-      -- these use --ignore-working-copy to stay fast and side-effect free.
       local function log1(revset, template)
         return run({ "--ignore-working-copy", "log", "--no-graph", "-r", revset, "-T", template })
       end
 
-      -- Short change-id (shortest unique prefix; raise the number for more chars).
       local changeid = log1("@", "change_id.shortest(1)")
       changeid = changeid and vim.trim(changeid) or "?"
 
-      -- Nearest ancestor bookmark, and how many revisions @ is ahead of it.
       local bm = log1("heads(::@ & bookmarks())", 'bookmarks.join(",") ++ "\n"')
       bm = bm and bm:match("[^\r\n,]+") or nil
       local ahead = 0
@@ -84,8 +64,6 @@ return {
         end
       end
 
-      -- Assemble, mirroring the ohmyposh segment:
-      --   <icon> <bookmark><⇡ahead> <changeid> [<edit-icon> <stat>]
       local parts = { SC_ICON }
       if bm then
         parts[#parts + 1] = bm .. (ahead > 0 and (AHEAD_ICON .. ahead) or "")
@@ -118,31 +96,24 @@ return {
       return not jj.is_repo
     end
 
-    -- Refresh the cached jj value on the events where it might have changed.
     vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "FocusGained", "DirChanged" }, {
       group = vim.api.nvim_create_augroup("lualine_jj", { clear = true }),
       callback = jj_refresh,
     })
-    jj_refresh() -- prime it now so it shows immediately
+    jj_refresh()
 
-    -- ----- Lualine setup -----
     require("lualine").setup({
       options = {
-        theme = "auto", -- derive colors from the active colorscheme (Dracula)
-        icons_enabled = true,
-        globalstatus = true, -- one shared statusline across all splits
-        section_separators = { left = "", right = "" },
-        component_separators = { left = "", right = "" },
+        theme = "auto",
+        globalstatus = true,
       },
       sections = {
-        -- Section B: our jj component (jj repos), git branch (elsewhere), then diff/diagnostics.
         lualine_b = {
           { jj_component },
           { "branch", cond = not_jj_repo },
           "diff",
           "diagnostics",
         },
-        -- The rest keep Lualine's sensible defaults.
         lualine_c = { "filename" },
         lualine_x = { "encoding", "fileformat", "filetype" },
         lualine_y = { "progress" },

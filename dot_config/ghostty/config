@@ -10,8 +10,7 @@ quick-terminal-position = "top"
 quick-terminal-screen = "main"
 quick-terminal-animation-duration = 0.05
 
-# Font -- use the fully-complete installed Nerd Font so all glyphs (icons,
-# powerline separators, devicons) render, rather than the default + partial fallback.
+# Nerd Font for icon/powerline glyphs.
 font-family = "JetBrainsMono Nerd Font Mono"
 
 # Visuals
