@@ -5,8 +5,10 @@ export HISTFILE=$XDG_DATA_HOME/zsh/history
 # Path Configuration
 export PATH="$HOME/.local/bin:/opt/homebrew/opt/node@20/bin:$PATH"
 
-# Default editor
-export EDITOR="zed --wait"
+# Default editor: nvim for quick terminal edits (git commits, etc.),
+# Zed as the GUI editor ($VISUAL, used by tools that prefer a full editor).
+export EDITOR="nvim"
+export VISUAL="zed --wait"
 
 # Launch herdr if not in a herdr session
 if [[ -z "$HERDR_ENV" ]]; then
