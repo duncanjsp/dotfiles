@@ -20,14 +20,14 @@ opt.mouse = "a"
 -- automatically) and per-language rules override these; a formatter like
 -- Prettier (added later via conform.nvim) wins for files it formats.
 opt.expandtab = false -- the Tab key inserts a real tab character, not spaces
-opt.tabstop = 4       -- a tab character displays as 4 columns
-opt.shiftwidth = 4    -- `>>`, `<<`, and auto-indent step by 4 columns
+opt.tabstop = 4 -- a tab character displays as 4 columns
+opt.shiftwidth = 4 -- `>>`, `<<`, and auto-indent step by 4 columns
 opt.smartindent = true
 
 -- Searching: case-insensitive UNLESS the query contains a capital letter.
 opt.ignorecase = true
 opt.smartcase = true
-opt.hlsearch = true  -- highlight all matches (we clear them with <Esc>, see keymaps)
+opt.hlsearch = true -- highlight all matches (we clear them with <Esc>, see keymaps)
 opt.incsearch = true -- show matches incrementally as you type
 
 -- 24-bit "true color" -- required for modern colorschemes like Dracula to
@@ -55,7 +55,7 @@ opt.splitbelow = true
 opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldlevel = 99 -- start fully unfolded (a high level means nothing is folded)
-opt.foldtext = ""  -- show the folded line with its normal highlighting
+opt.foldtext = "" -- show the folded line with its normal highlighting
 
 -- Shorter update time -> snappier UI (also controls the which-key popup delay later).
 opt.updatetime = 250

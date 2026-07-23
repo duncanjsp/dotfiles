@@ -21,9 +21,9 @@ return {
     -- ----- Jujutsu (jj) status, cached -----
     -- Icons built from codepoints via nr2char, so no fragile Private-Use bytes
     -- live in this file. Change a number to swap a glyph (see nerdfonts.com).
-    local SC_ICON = vim.fn.nr2char(0xe0a0)    -- powerline branch (source control)
+    local SC_ICON = vim.fn.nr2char(0xe0a0) -- powerline branch (source control)
     local AHEAD_ICON = vim.fn.nr2char(0x21e1) -- upwards dashed arrow (revisions ahead)
-    local EDIT_ICON = vim.fn.nr2char(0xf040)  -- pencil (working copy has edits)
+    local EDIT_ICON = vim.fn.nr2char(0xf040) -- pencil (working copy has edits)
 
     local jj = { text = "", is_repo = false }
 

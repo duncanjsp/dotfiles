@@ -12,9 +12,9 @@ return {
 
   -- lazy.nvim installs these automatically:
   dependencies = {
-    "nvim-lua/plenary.nvim",       -- common Lua utility functions (used by many plugins)
+    "nvim-lua/plenary.nvim", -- common Lua utility functions (used by many plugins)
     "nvim-tree/nvim-web-devicons", -- filetype icons (needs the Nerd Font -- you have it)
-    "MunifTanjim/nui.nvim",        -- UI component library Neo-tree is built on
+    "MunifTanjim/nui.nvim", -- UI component library Neo-tree is built on
   },
 
   -- Load Neo-tree lazily -- only when you first use it, either via the key or
@@ -36,8 +36,8 @@ return {
       use_libuv_file_watcher = true,
 
       filtered_items = {
-        visible = true,          -- still show filtered items, just dimmed...
-        hide_dotfiles = false,   -- ...and don't hide dotfiles (you edit these!)
+        visible = true, -- still show filtered items, just dimmed...
+        hide_dotfiles = false, -- ...and don't hide dotfiles (you edit these!)
         hide_gitignored = false, -- ...or git-ignored files
       },
     },
