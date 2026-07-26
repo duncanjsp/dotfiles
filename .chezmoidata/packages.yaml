@@ -1,0 +1,15 @@
+packages:
+  brews:
+    - atuin
+    - bat
+    - carapace
+    - eza
+    - fastfetch
+    - git
+    - herdr
+    - jandedobbeleer/oh-my-posh/oh-my-posh
+    - jj
+    - mise
+    - neovim
+    - stylua
+    - umputun/apps/revdiff
