@@ -1,7 +1,8 @@
-{{- if eq .profile "server" -}}
+{{- if eq .chezmoi.os "linux" -}}
 #!/bin/bash
-# Servers get their CLI tools from mise rather than Homebrew: user-local, no
-# sudo, no shadowing of the distro's git/curl/openssl. See .chezmoidata/packages.yaml.
+# Linux gets its CLI tools from mise rather than Homebrew: user-local, no sudo,
+# no shadowing of the distro's git/curl/openssl, and identical on Debian-based
+# and immutable distros alike. See .chezmoidata/packages.yaml.
 set -eo pipefail
 
 if ! command -v mise >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/mise" ]; then

@@ -1,15 +1,25 @@
-{{- /* Machine profile drives every conditional in this repo. Known Macs are
-       recognised by hostname; any Linux box is a server (they have varying
-       names). Anything else asks once, at init. */ -}}
-{{- $profile := "" -}}
-{{- if eq .chezmoi.hostname "fantasmic" -}}
-{{-   $profile = "personal" -}}
-{{- else if eq .chezmoi.hostname "test-track" -}}
+{{- /* Three independent axes describe a machine; every conditional in this repo
+       keys off exactly one of them.
+
+         profile      identity: personal or work. Drives the git identity,
+                      signing key, work remotes and the encrypted work blob.
+         .chezmoi.os  darwin or linux. Drives the package manager and the
+                      paths of platform-specific binaries.
+         gui          is there a desktop? Drives Ghostty, Zed, herdr and
+                      commit signing (which needs the 1Password desktop app).
+
+       A server is not a profile: it is Linux with gui = false. Keeping these
+       separate is what lets a personal Linux desktop exist without every
+       conditional growing a new case. */ -}}
+{{- $profile := "personal" -}}
+{{- $gui := true -}}
+{{- /* Work is exactly one Mac; everything else is personal. Unknown hosts are
+       asked whether they have a desktop, defaulting to false so that a
+       non-interactive server bootstrap lands on the safe answer. */ -}}
+{{- if eq .chezmoi.hostname "test-track" -}}
 {{-   $profile = "work" -}}
-{{- else if eq .chezmoi.os "linux" -}}
-{{-   $profile = "server" -}}
-{{- else -}}
-{{-   $profile = promptChoiceOnce . "profile" "Machine profile" (list "personal" "work" "server") -}}
+{{- else if ne .chezmoi.hostname "fantasmic" -}}
+{{-   $gui = promptBoolOnce . "gui" "Desktop machine (install GUI configs)" false -}}
 {{- end -}}
 {{- $email := promptStringOnce . "email" "Email address" "duncan@psmail.co" -}}
 
@@ -18,10 +28,11 @@ encryption = "age"
 [data]
 email = {{ $email | quote }}
 profile = {{ $profile | quote }}
-gui = {{ ne $profile "server" }}
+gui = {{ $gui }}
 
 # No identity on disk: bin/age-op fetches the private key from 1Password at
-# decrypt time. Only the public recipient lives here. Servers never decrypt.
+# decrypt time. Only the public recipient lives here. Only the work Mac has
+# anything to decrypt.
 [age]
 command = {{ (joinPath .chezmoi.sourceDir "bin/age-op") | quote }}
 recipient = "age13maate0garz665d5le655t2vdctuwz4s8plfnu0xpjvwkmhmhe3sxvdgwe"

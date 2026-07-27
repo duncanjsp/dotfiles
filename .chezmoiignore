@@ -1,9 +1,12 @@
 README.md
 bin
-{{ if ne .profile "work" }}
+{{/* Per-host shell resources key off the hostname, not the profile: there is
+     more than one personal machine, so `profile == personal` no longer picks
+     out a single box. */}}
+{{ if ne .chezmoi.hostname "test-track" }}
 .config/zsh/resources/test-track.zsh
 {{ end }}
-{{ if ne .profile "personal" }}
+{{ if ne .chezmoi.hostname "fantasmic" }}
 .config/zsh/resources/fantasmic.zsh
 {{ end }}
 {{ if not .gui }}
@@ -11,4 +14,12 @@ bin
 .config/herdr
 .config/native-shortcuts-herd
 .config/zed
+{{ end }}
+{{/* The herd shortcuts bind cmd, so they are macOS-only even on a desktop. */}}
+{{ if ne .chezmoi.os "darwin" }}
+.config/native-shortcuts-herd
+{{ end }}
+{{/* Execs into zsh when chsh could not change the login shell; Linux only. */}}
+{{ if ne .chezmoi.os "linux" }}
+.bash_profile
 {{ end }}

@@ -22,13 +22,15 @@
 [alias]
 	co = checkout
 	getremote = !git fetch && git reset --hard @{u}
-{{ if ne .profile "server" -}}
+{{ if .gui -}}
 [gpg "ssh"]
-	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+	program = {{ if eq .chezmoi.os "darwin" }}/Applications/1Password.app/Contents/MacOS/op-ssh-sign{{ else }}/opt/1Password/op-ssh-sign{{ end }}
 {{ end -}}
 [commit]
-{{- /* Servers have no 1Password binary, so signing would fail on every commit. */}}
-	gpgsign = {{ if eq .profile "server" }}false{{ else }}true{{ end }}
+{{- /* Signing is done by the 1Password desktop app, so it tracks the GUI axis
+       rather than the OS: a headless box has no op-ssh-sign to call and every
+       commit would fail. */}}
+	gpgsign = {{ .gui }}
 [push]
 	autoSetupRemote = true
 [user]{{ if eq .profile "work" }}
