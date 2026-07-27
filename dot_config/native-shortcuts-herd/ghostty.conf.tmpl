@@ -1,0 +1,106 @@
+{{- /* Ghostty key routing for herdr. Each binding sends herdr's prefix (\x02,
+       i.e. ctrl-b) plus a command character, or a CSI u sequence; Ghostty's own
+       binding for the same chord is unbound so it does not steal the key.
+
+       The macOS half is what `native-shortcuts-herd install` generated. The
+       Linux half mirrors it with cmd -> ctrl+shift, the conventional Linux
+       terminal equivalent. super is deliberately avoided: desktop environments
+       grab it for window management, so those chords would never reach the
+       terminal. Section order matches the generated file so the macOS output
+       stays byte-identical to it. */ -}}
+# native-shortcuts-herd: managed ghostty key routing
+# edit with: native-shortcuts-herd install
+{{ if eq .chezmoi.os "darwin" }}
+# macos/chrome-style herdr actions
+keybind = cmd+KeyT=text:\x02t
+keybind = cmd+t=unbind
+keybind = cmd+KeyN=text:\x02n
+keybind = cmd+n=unbind
+keybind = cmd+KeyW=text:\x02x
+keybind = cmd+w=unbind
+keybind = cmd+KeyK=text:\x02N
+keybind = cmd+k=unbind
+keybind = cmd+KeyL=text:\x02T
+keybind = cmd+l=unbind
+keybind = cmd+KeyD=text:\x02v
+keybind = cmd+d=unbind
+keybind = cmd+shift+KeyD=text:\x02-
+keybind = cmd+shift+d=unbind
+keybind = alt+t=text:\x02t
+{{- else }}
+# linux herdr actions: cmd -> ctrl+shift
+keybind = ctrl+shift+KeyT=text:\x02t
+keybind = ctrl+shift+t=unbind
+keybind = ctrl+shift+KeyN=text:\x02n
+keybind = ctrl+shift+n=unbind
+keybind = ctrl+shift+KeyW=text:\x02x
+keybind = ctrl+shift+w=unbind
+keybind = ctrl+shift+KeyK=text:\x02N
+keybind = ctrl+shift+k=unbind
+keybind = ctrl+shift+KeyL=text:\x02T
+keybind = ctrl+shift+l=unbind
+keybind = ctrl+shift+KeyD=text:\x02v
+keybind = ctrl+shift+d=unbind
+# cmd+shift+d has no ctrl+shift+shift counterpart, so the second split moves to
+# ctrl+alt+d rather than colliding with the first.
+keybind = ctrl+alt+KeyD=text:\x02-
+keybind = ctrl+alt+d=unbind
+keybind = alt+t=text:\x02t
+{{- end }}
+
+# ctrl+tab / ctrl+shift+tab -> herdr workspaces
+keybind = ctrl+tab=text:\x1b[9;5u
+keybind = ctrl+shift+tab=text:\x1b[9;6u
+
+# ctrl+alt+tab / ctrl+alt+shift+tab -> herdr tabs
+keybind = ctrl+alt+tab=text:\x1b[9;7u
+keybind = ctrl+alt+shift+tab=text:\x1b[9;8u
+{{ if eq .chezmoi.os "darwin" }}
+# cmd+shift+[ and ] to go through tabs
+keybind = cmd+shift+]=text:\x1b[9;7u
+keybind = cmd+shift+[=text:\x1b[9;8u
+
+# cmd+1..9 -> herdr workspaces
+keybind = cmd+digit_1=text:\x1b[49;6u
+keybind = cmd+1=text:\x1b[49;6u
+keybind = cmd+digit_2=text:\x1b[50;6u
+keybind = cmd+2=text:\x1b[50;6u
+keybind = cmd+digit_3=text:\x1b[51;6u
+keybind = cmd+3=text:\x1b[51;6u
+keybind = cmd+digit_4=text:\x1b[52;6u
+keybind = cmd+4=text:\x1b[52;6u
+keybind = cmd+digit_5=text:\x1b[53;6u
+keybind = cmd+5=text:\x1b[53;6u
+keybind = cmd+digit_6=text:\x1b[54;6u
+keybind = cmd+6=text:\x1b[54;6u
+keybind = cmd+digit_7=text:\x1b[55;6u
+keybind = cmd+7=text:\x1b[55;6u
+keybind = cmd+digit_8=text:\x1b[56;6u
+keybind = cmd+8=text:\x1b[56;6u
+keybind = cmd+digit_9=text:\x1b[57;6u
+keybind = cmd+9=text:\x1b[57;6u
+{{- else }}
+# ctrl+shift+[ and ] to go through tabs
+keybind = ctrl+shift+]=text:\x1b[9;7u
+keybind = ctrl+shift+[=text:\x1b[9;8u
+
+# ctrl+shift+1..9 -> herdr workspaces
+keybind = ctrl+shift+digit_1=text:\x1b[49;6u
+keybind = ctrl+shift+1=text:\x1b[49;6u
+keybind = ctrl+shift+digit_2=text:\x1b[50;6u
+keybind = ctrl+shift+2=text:\x1b[50;6u
+keybind = ctrl+shift+digit_3=text:\x1b[51;6u
+keybind = ctrl+shift+3=text:\x1b[51;6u
+keybind = ctrl+shift+digit_4=text:\x1b[52;6u
+keybind = ctrl+shift+4=text:\x1b[52;6u
+keybind = ctrl+shift+digit_5=text:\x1b[53;6u
+keybind = ctrl+shift+5=text:\x1b[53;6u
+keybind = ctrl+shift+digit_6=text:\x1b[54;6u
+keybind = ctrl+shift+6=text:\x1b[54;6u
+keybind = ctrl+shift+digit_7=text:\x1b[55;6u
+keybind = ctrl+shift+7=text:\x1b[55;6u
+keybind = ctrl+shift+digit_8=text:\x1b[56;6u
+keybind = ctrl+shift+8=text:\x1b[56;6u
+keybind = ctrl+shift+digit_9=text:\x1b[57;6u
+keybind = ctrl+shift+9=text:\x1b[57;6u
+{{- end }}

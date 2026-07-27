@@ -17,8 +17,4 @@ font-family = "{{ .font.family }}"
 # shipped with Ghostty is vendored under themes/ alongside this file.
 theme = {{ (index .themes .theme).ghostty | quote }}
 
-{{ if eq .chezmoi.os "darwin" -}}
-{{/* The herd shortcuts bind cmd, so they only ship on macOS. Including a file
-     that is not there makes Ghostty complain on every launch. */ -}}
 config-file = ../native-shortcuts-herd/ghostty.conf
-{{ end -}}

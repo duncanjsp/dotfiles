@@ -1,23 +1,18 @@
 README.md
 bin
-{{/* Per-host shell resources key off the hostname, not the profile: there is
-     more than one personal machine, so `profile == personal` no longer picks
-     out a single box. */}}
-{{ if ne .chezmoi.hostname "test-track" }}
-.config/zsh/resources/test-track.zsh
+{{/* Shell resources are scoped by identity, not by hostname: their contents are
+     "any personal machine" and "the work machine" rather than one named box. */}}
+{{ if ne .profile "work" }}
+.config/zsh/resources/work.zsh
 {{ end }}
-{{ if ne .chezmoi.hostname "fantasmic" }}
-.config/zsh/resources/fantasmic.zsh
+{{ if ne .profile "personal" }}
+.config/zsh/resources/personal.zsh
 {{ end }}
 {{ if not .gui }}
 .config/ghostty
 .config/herdr
 .config/native-shortcuts-herd
 .config/zed
-{{ end }}
-{{/* The herd shortcuts bind cmd, so they are macOS-only even on a desktop. */}}
-{{ if ne .chezmoi.os "darwin" }}
-.config/native-shortcuts-herd
 {{ end }}
 {{/* Execs into zsh when chsh could not change the login shell; Linux only. */}}
 {{ if ne .chezmoi.os "linux" }}
