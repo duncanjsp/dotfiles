@@ -1,14 +1,10 @@
-{{- if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
+{{- if eq .chezmoi.os "darwin" -}}
 #!/bin/bash
 set -euo pipefail
 
 if ! command -v brew >/dev/null 2>&1; then
 	NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-	if [ -x /opt/homebrew/bin/brew ]; then
-		eval "$(/opt/homebrew/bin/brew shellenv)"
-	elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
-		eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-	fi
+	eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 brew bundle install --file=- <<'BREWFILE'

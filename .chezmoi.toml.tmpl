@@ -1,12 +1,27 @@
-{{- $email := promptStringOnce . "email" "Email address" -}}
+{{- /* Machine profile drives every conditional in this repo. Known Macs are
+       recognised by hostname; any Linux box is a server (they have varying
+       names). Anything else asks once, at init. */ -}}
+{{- $profile := "" -}}
+{{- if eq .chezmoi.hostname "fantasmic" -}}
+{{-   $profile = "personal" -}}
+{{- else if eq .chezmoi.hostname "test-track" -}}
+{{-   $profile = "work" -}}
+{{- else if eq .chezmoi.os "linux" -}}
+{{-   $profile = "server" -}}
+{{- else -}}
+{{-   $profile = promptChoiceOnce . "profile" "Machine profile" (list "personal" "work" "server") -}}
+{{- end -}}
+{{- $email := promptStringOnce . "email" "Email address" "duncan@psmail.co" -}}
 
 encryption = "age"
 
 [data]
 email = {{ $email | quote }}
+profile = {{ $profile | quote }}
+gui = {{ ne $profile "server" }}
 
 # No identity on disk: bin/age-op fetches the private key from 1Password at
-# decrypt time. Only the public recipient lives here.
+# decrypt time. Only the public recipient lives here. Servers never decrypt.
 [age]
 command = {{ (joinPath .chezmoi.sourceDir "bin/age-op") | quote }}
 recipient = "age13maate0garz665d5le655t2vdctuwz4s8plfnu0xpjvwkmhmhe3sxvdgwe"

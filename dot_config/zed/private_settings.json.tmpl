@@ -9,7 +9,7 @@
 		"dock": "right"
 	},
 	"edit_predictions": {
-		{{- if eq .chezmoi.hostname "test-track" }}
+		{{- if eq .profile "work" }}
 		"provider": "copilot"
 		{{- else }}
 		"provider": "zed"
@@ -29,7 +29,7 @@
 		},
 		"default_profile": "write",
 		"default_model": {
-			{{- if eq .chezmoi.hostname "test-track" }}
+			{{- if eq .profile "work" }}
 			"provider": "copilot_chat",
 			"model": "gpt-5.2"
 			{{- else }}
@@ -38,7 +38,7 @@
 			{{- end }}
 		}
 	},
-	{{- if ne .chezmoi.hostname "test-track" }}
+	{{- if ne .profile "work" }}
 	"agent_servers": {
 		"codex-acp": {
 			"type": "registry",

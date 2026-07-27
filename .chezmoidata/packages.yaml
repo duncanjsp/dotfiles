@@ -1,4 +1,5 @@
 packages:
+  # Homebrew formulae, installed on the Macs only.
   brews:
     - atuin
     - bat
@@ -13,3 +14,17 @@ packages:
     - neovim
     - stylua
     - umputun/apps/revdiff
+  # Servers use mise instead: user-local, no sudo, prebuilt binaries via aqua.
+  # Deliberately omits herdr (GUI workflow), revdiff and stylua (Mac-only
+  # tooling), and git (comes from the distro).
+  # neovim@latest resolves to nightly, hence the explicit @stable.
+  # eza has no aqua backend in mise's registry, so it comes from releases.
+  mise:
+    - neovim@stable
+    - oh-my-posh@latest
+    - atuin@latest
+    - carapace@latest
+    - bat@latest
+    - fastfetch@latest
+    - jj@latest
+    - ubi:eza-community/eza@latest

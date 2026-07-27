@@ -1,0 +1,20 @@
+{{- if eq .profile "server" -}}
+#!/bin/bash
+# Servers get their CLI tools from mise rather than Homebrew: user-local, no
+# sudo, no shadowing of the distro's git/curl/openssl. See .chezmoidata/packages.yaml.
+set -eo pipefail
+
+if ! command -v mise >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/mise" ]; then
+	curl -fsSL https://mise.run | sh
+fi
+
+MISE="$(command -v mise || echo "$HOME/.local/bin/mise")"
+if [ ! -x "$MISE" ]; then
+	echo "mise not available at $MISE; cannot install tools" >&2
+	exit 1
+fi
+
+"$MISE" use --global --yes \
+{{ range $i, $tool := .packages.mise }}	{{ $tool | quote }}{{ if lt (add1 $i) (len $.packages.mise) }} \{{ end }}
+{{ end }}
+{{ end -}}

@@ -1,4 +1,4 @@
-{{- if eq .chezmoi.hostname "test-track" }}
+{{- if eq .profile "work" }}
 {{- $work := include ".chezmoitemplates/work.yaml.age" | decrypt | fromYaml }}
 {{- $workRemotes := concat $work.git.orgs $work.git.users -}}
 [url "{{ $work.git.gitlabSsh }}"]
@@ -22,13 +22,16 @@
 [alias]
 	co = checkout
 	getremote = !git fetch && git reset --hard @{u}
+{{ if ne .profile "server" -}}
 [gpg "ssh"]
 	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+{{ end -}}
 [commit]
-	gpgsign = true
+{{- /* Servers have no 1Password binary, so signing would fail on every commit. */}}
+	gpgsign = {{ if eq .profile "server" }}false{{ else }}true{{ end }}
 [push]
 	autoSetupRemote = true
-[user]{{ if eq .chezmoi.hostname "test-track" }}
+[user]{{ if eq .profile "work" }}
 	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAEDbXQOIRzbFI6Q3q0RHWVHloBrEcNagqPfk4fhbtsY{{ else }}
 	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL2ypgsJT6cu614LIGHPhNEK+l084Txm7SjkMZVPlX0z{{ end }}
 	name = Duncan Stevenson-Price

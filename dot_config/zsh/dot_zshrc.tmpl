@@ -3,25 +3,31 @@ export HISTFILE=$XDG_DATA_HOME/zsh/history
 [[ -d ${HISTFILE:h} ]] || mkdir -p ${HISTFILE:h}
 
 # Path Configuration
+{{ if eq .chezmoi.os "darwin" -}}
 export PATH="$HOME/.local/bin:/opt/homebrew/opt/node@20/bin:$PATH"
+{{- else -}}
+export PATH="$HOME/.local/bin:$PATH"
+{{- end }}
 
 # nvim for all editor invocations. VISUAL is deliberately unset: tools prefer it
 # over EDITOR, which would open Zed from the terminal. Use `zed {file}` directly.
 export EDITOR="nvim"
-
+{{ if .gui }}
 # Launch herdr, except in the Ghostty quick terminal
 if [[ -z "$HERDR_ENV" && "$GHOSTTY_QUICK_TERMINAL" != "1" ]]; then
 	exec herdr || exit
 fi
-
+{{ end }}
+# Tools are guarded so a shell still starts on a box where one is missing or
+# mise has not finished installing them yet.
 # OhMyPosh Config https://ohmyposh.dev/docs/
-eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/ohmyposh/config.toml)"
+command -v oh-my-posh >/dev/null && eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/ohmyposh/config.toml)"
 
 # Load Atuin: https://atuin.sh/
-eval "$(atuin init zsh)"
+command -v atuin >/dev/null && eval "$(atuin init zsh)"
 
 # Load Mise https://mise.jdx.dev/
-eval "$(mise activate zsh)"
+command -v mise >/dev/null && eval "$(mise activate zsh)"
 
 # Load supplementary configuration files
 if [ -d "$XDG_CONFIG_HOME/zsh/resources" ]; then
@@ -37,6 +43,8 @@ zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # case-insensitive fallback for non-carapace completions
 zstyle ':completion:*' menu select                     # menu selection
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # color completion
-source <(carapace _carapace)
+command -v carapace >/dev/null && source <(carapace _carapace)
 
-fastfetch
+# `|| true` keeps $? at 0 for the first prompt: this is the last line of the
+# file, so a skipped fastfetch would otherwise show as an error in the prompt.
+command -v fastfetch >/dev/null && fastfetch || true

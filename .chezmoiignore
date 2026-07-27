@@ -1,8 +1,14 @@
 README.md
 bin
-{{ if ne .chezmoi.hostname "test-track" }}
+{{ if ne .profile "work" }}
 .config/zsh/resources/test-track.zsh
 {{ end }}
-{{ if ne .chezmoi.hostname "fantasmic" }}
+{{ if ne .profile "personal" }}
 .config/zsh/resources/fantasmic.zsh
+{{ end }}
+{{ if not .gui }}
+.config/ghostty
+.config/herdr
+.config/native-shortcuts-herd
+.config/zed
 {{ end }}
