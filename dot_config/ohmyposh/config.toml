@@ -34,9 +34,10 @@ final_space = true
   [[blocks.segments]]
     leading_diamond = ''
     trailing_diamond = ''
-    template = '{{ if .SSHSession }} {{ else }} {{ end }}{{ .UserName }}{{ if .SSHSession }}@{{ .HostName }}{{ end }} '
+    template = '{{ if eq .OS "darwin" }} {{ else }} {{ end }}{{ .UserName }}{{ if .SSHSession }}@{{ .HostName }}{{ end }} '
     foreground = 'p:black'
     background = 'p:yellow'
+    background_templates = ['{{ if .SSHSession }}p:blue{{ end }}']
     type = 'session'
     style = 'diamond'
 
