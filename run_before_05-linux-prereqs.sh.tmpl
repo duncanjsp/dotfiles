@@ -1,0 +1,49 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+# Linux prerequisites that need root: a C toolchain (nvim-treesitter builds
+# parsers with cc, telescope-fzf-native compiles C) and zsh as the login shell.
+# Every Linux box needs these, desktop or headless — nvim is the same either way.
+#
+# Runs on every apply but exits immediately once satisfied. Uses `sudo -n`
+# throughout so it can never sit waiting for a password and hang an apply over
+# SSH; where it cannot act, it prints the command to run and continues.
+set -o pipefail
+
+log() { printf 'prereqs: %s\n' "$1" >&2; }
+
+# Deliberately not build-essential: that adds g++ and dpkg-dev we do not need.
+missing=()
+command -v make >/dev/null 2>&1 || missing+=(make)
+if ! command -v cc >/dev/null 2>&1 && ! command -v gcc >/dev/null 2>&1; then
+	missing+=(gcc libc6-dev)
+fi
+command -v zsh >/dev/null 2>&1 || missing+=(zsh)
+
+if [ ${#missing[@]} -gt 0 ]; then
+	if command -v apt-get >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+		log "installing ${missing[*]}"
+		sudo -n apt-get update -qq || log "apt-get update failed; continuing"
+		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}" ||
+			log "install failed; run: sudo apt-get install -y ${missing[*]}"
+	else
+		log "missing ${missing[*]} — run: sudo apt-get install -y ${missing[*]}"
+	fi
+fi
+
+# Make zsh the login shell. Needs root to edit /etc/passwd without a password
+# prompt; when that is unavailable, .bash_profile execs into zsh instead.
+zsh_path="$(command -v zsh 2>/dev/null || true)"
+if [ -n "$zsh_path" ] && [ "${SHELL:-}" != "$zsh_path" ]; then
+	if sudo -n true 2>/dev/null; then
+		if sudo -n chsh -s "$zsh_path" "$(id -un)" 2>/dev/null; then
+			log "login shell set to $zsh_path"
+		else
+			log "could not set login shell; run: chsh -s $zsh_path"
+		fi
+	else
+		log "login shell is ${SHELL:-unset}; .bash_profile will exec zsh instead"
+	fi
+fi
+
+exit 0
+{{ end -}}

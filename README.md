@@ -49,21 +49,22 @@ installs its theme extension itself via `auto_install_extensions`.
 The repo is public and servers pull anonymously over HTTPS, so no credentials,
 SSH key or 1Password access are required.
 
-Install the prerequisites first. These are not managed by chezmoi because they
-need `sudo`, and mise cannot sensibly provide a login shell or a C toolchain:
-
-```sh
-sudo apt update && sudo apt install -y zsh git curl build-essential
-```
-
-`build-essential` supplies `make` and a C compiler, which
-`telescope-fzf-native.nvim` needs at build time.
-
-Then:
-
 ```sh
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply duncanjsp
-chsh -s "$(which zsh)"
 ```
 
-Log out and back in. Subsequent updates are `chezmoi update`.
+`run_before_05-server-prereqs.sh` handles the rest where it can. It installs
+`make`, `gcc` and `libc6-dev` — nvim-treesitter builds parsers with `cc` and
+`telescope-fzf-native` compiles C, so a compiler is required; `build-essential`
+is deliberately avoided as it also pulls in `g++` and `dpkg-dev`. It then sets
+zsh as the login shell.
+
+All of that needs root, so it runs under `sudo -n` and never prompts: with
+passwordless sudo it just works, otherwise it prints the commands to run and
+carries on. `git` and `curl` are assumed present — the bootstrap line above
+cannot run without them.
+
+If the login shell could not be changed, `.bash_profile` execs into zsh for
+interactive logins instead, so either route lands you in the right shell.
+
+Subsequent updates are `chezmoi update`.

@@ -1,0 +1,17 @@
+# Servers only. If chsh could not run (no passwordless sudo), bash is still the
+# login shell — so hand interactive logins over to zsh here instead.
+#
+# Guarded on interactivity so scp/sftp/rsync and other non-interactive sessions
+# are untouched, and on zsh existing so a box without it stays usable.
+
+# Keep the distro's own login setup, which bash would otherwise skip: it reads
+# .bash_profile in preference to .profile.
+[ -f "$HOME/.profile" ] && . "$HOME/.profile"
+
+case $- in
+*i*)
+	if [ -z "${ZSH_VERSION:-}" ] && command -v zsh >/dev/null 2>&1; then
+		exec zsh -l
+	fi
+	;;
+esac
