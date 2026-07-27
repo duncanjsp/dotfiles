@@ -5,9 +5,9 @@ export HISTFILE=$XDG_DATA_HOME/zsh/history
 # Path Configuration
 export PATH="$HOME/.local/bin:/opt/homebrew/opt/node@20/bin:$PATH"
 
-# nvim for terminal edits, Zed for GUI.
+# nvim for all editor invocations. VISUAL is deliberately unset: tools prefer it
+# over EDITOR, which would open Zed from the terminal. Use `zed {file}` directly.
 export EDITOR="nvim"
-export VISUAL="zed --wait"
 
 # Launch herdr, except in the Ghostty quick terminal
 if [[ -z "$HERDR_ENV" && "$GHOSTTY_QUICK_TERMINAL" != "1" ]]; then
