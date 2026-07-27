@@ -1,0 +1,43 @@
+#!/bin/bash
+# age wrapper that sources its decryption identity from 1Password rather than
+# from a key file on disk. Wired up via [age] command in chezmoi's config; see
+# .chezmoi.toml.tmpl. Lives in the source dir (and is listed in .chezmoiignore)
+# so it is present as soon as the repo is cloned, before any file is applied.
+#
+# Encryption is untouched: age uses --recipient for that and needs no identity.
+set -eo pipefail
+
+OP_REF="op://Private/Chezmoi encryption/age key/private key"
+
+# Drop any --identity chezmoi passes; we supply our own on a file descriptor.
+args=()
+skip=0
+decrypt=0
+for arg in "$@"; do
+	if [ "$skip" -eq 1 ]; then
+		skip=0
+		continue
+	fi
+	case "$arg" in
+	-i | --identity)
+		skip=1
+		;;
+	-d | --decrypt)
+		decrypt=1
+		args+=("$arg")
+		;;
+	*)
+		args+=("$arg")
+		;;
+	esac
+done
+
+if [ "$decrypt" -eq 1 ]; then
+	if ! command -v op >/dev/null 2>&1; then
+		echo "age-op: 1Password CLI (op) not found; cannot fetch age identity" >&2
+		exit 1
+	fi
+	exec age "${args[@]}" -i <(op read "$OP_REF")
+fi
+
+exec age "${args[@]}"

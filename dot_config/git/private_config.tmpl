@@ -1,17 +1,10 @@
 {{- if eq .chezmoi.hostname "test-track" }}
-{{- $workOrgs := list "agilebits-inc" "agilebits-tst-EMU" "agilebits-sandbox-EMU" }}
-{{- $workUsers := list "ben-kirby_1pw" "duncan-stevenson_1pw" "riyad-khan_1pw" -}}
-[url "ssh://git@ssh.gitlab.1password.io:2227"]
-	insteadOf = https://gitlab.1password.io
+{{- $work := include ".chezmoitemplates/work.yaml.age" | decrypt | fromYaml }}
+{{- $workRemotes := concat $work.git.orgs $work.git.users -}}
+[url "{{ $work.git.gitlabSsh }}"]
+	insteadOf = {{ $work.git.gitlabHttps }}
 
-{{ range $workOrgs -}}
-[url "git@github.com-work:{{ . }}/"]
-	insteadOf = git@github.com:{{ . }}/
-	insteadOf = https://github.com/{{ . }}/
-	insteadOf = ssh://git@github.com/{{ . }}/
-
-{{ end -}}
-{{ range $workUsers -}}
+{{ range $workRemotes -}}
 [url "git@github.com-work:{{ . }}/"]
 	insteadOf = git@github.com:{{ . }}/
 	insteadOf = https://github.com/{{ . }}/

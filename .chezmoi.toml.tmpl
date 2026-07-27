@@ -1,4 +1,12 @@
 {{- $email := promptStringOnce . "email" "Email address" -}}
 
+encryption = "age"
+
 [data]
 email = {{ $email | quote }}
+
+# No identity on disk: bin/age-op fetches the private key from 1Password at
+# decrypt time. Only the public recipient lives here.
+[age]
+command = {{ (joinPath .chezmoi.sourceDir "bin/age-op") | quote }}
+recipient = "age13maate0garz665d5le655t2vdctuwz4s8plfnu0xpjvwkmhmhe3sxvdgwe"

@@ -1,4 +1,5 @@
 README.md
+bin
 {{ if ne .chezmoi.hostname "test-track" }}
 .config/zsh/resources/test-track.zsh
 {{ end }}
