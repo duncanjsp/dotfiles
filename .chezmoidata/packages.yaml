@@ -1,34 +1,60 @@
 packages:
-  # Homebrew formulae, installed on the Macs only.
+  # macOS: Homebrew. Both Macs in this fleet are desktops, so there is no
+  # headless variant to split out.
+  #
+  # tree-sitter and node@20 arrive as dependencies of neovim and of other
+  # formulae respectively, but both are used directly — nvim-treesitter shells
+  # out to the tree-sitter CLI, and .zshrc puts node@20 on PATH — so they are
+  # declared rather than left to chance. Relying on a transitive dependency is
+  # what let ripgrep go undeclared until a server exposed it.
   brews:
     - atuin
     - bat
     - carapace
+    - direnv
     - eza
     - fastfetch
+    - fd
     - git
+    - gum
     - herdr
     - jandedobbeleer/oh-my-posh/oh-my-posh
     - jj
     - mise
     - neovim
+    - node@20
+    - prettier
+    - ripgrep
     - stylua
+    - tree-sitter
     - umputun/apps/revdiff
-  # Servers use mise instead: user-local, no sudo, prebuilt binaries via aqua.
-  # Deliberately omits herdr (GUI workflow), revdiff and stylua (Mac-only
-  # tooling), and git (comes from the distro).
+  # Linux: mise. User-local, needs no sudo, and behaves identically on
+  # Debian-based and immutable distros — which is why desktops and servers share
+  # it rather than splitting on the distro's package manager.
+  #
+  # Omits git (comes from the distro), mise (installs itself) and revdiff (its
+  # tap ships no bottles, so it would need a Go toolchain to build).
   # neovim@latest resolves to nightly, hence the explicit @stable.
   # eza has no aqua backend in mise's registry, so it comes from releases.
   mise:
-    - neovim@stable
-    - oh-my-posh@latest
-    - atuin@latest
-    - carapace@latest
-    - bat@latest
-    - fastfetch@latest
-    - jj@latest
-    - ubi:eza-community/eza@latest
-    # nvim-treesitter's `main` branch shells out to the tree-sitter CLI to build
-    # parsers. On the Macs it arrives free as a Homebrew dependency of neovim;
-    # mise's neovim is a standalone binary, so it must be requested explicitly.
-    - tree-sitter@latest
+    core:
+      - atuin@latest
+      - bat@latest
+      - carapace@latest
+      - direnv@latest
+      - fastfetch@latest
+      - fd@latest
+      - gum@latest
+      - jj@latest
+      - neovim@stable
+      - node@latest
+      - npm:prettier@latest
+      - oh-my-posh@latest
+      - ripgrep@latest
+      - stylua@latest
+      - tree-sitter@latest
+      - ubi:eza-community/eza@latest
+    # Desktops only: herdr is a terminal-multiplexer workflow that only makes
+    # sense where a terminal emulator is running.
+    gui:
+      - herdr@latest

@@ -7,26 +7,66 @@
 # Runs on every apply but exits immediately once satisfied. Uses `sudo -n`
 # throughout so it can never sit waiting for a password and hang an apply over
 # SSH; where it cannot act, it prints the command to run and continues.
+#
+# Everything else comes from mise, which is distro-agnostic. This script is the
+# only place the distro matters, which is why it is the only place that has to
+# know about more than one package manager.
 set -o pipefail
 
-log() { printf 'prereqs: %s\n' "$1" >&2; }
+{{ template "lib/output.sh" . }}
 
-# Deliberately not build-essential: that adds g++ and dpkg-dev we do not need.
-missing=()
-command -v make >/dev/null 2>&1 || missing+=(make)
+# What is actually missing, expressed as needs rather than package names: the
+# names differ per distro but the requirements do not.
+need_make=0
+need_cc=0
+need_zsh=0
+command -v make >/dev/null 2>&1 || need_make=1
 if ! command -v cc >/dev/null 2>&1 && ! command -v gcc >/dev/null 2>&1; then
-	missing+=(gcc libc6-dev)
+	need_cc=1
 fi
-command -v zsh >/dev/null 2>&1 || missing+=(zsh)
+command -v zsh >/dev/null 2>&1 || need_zsh=1
 
-if [ ${#missing[@]} -gt 0 ]; then
+if [ $((need_make + need_cc + need_zsh)) -gt 0 ]; then
+	header "Build prerequisites"
+
+	# Deliberately not build-essential or @development-tools: those add g++ and
+	# packaging tooling that nothing here uses.
+	apt_pkgs=()
+	dnf_pkgs=()
+	brew_pkgs=()
+	if [ $need_make -eq 1 ]; then
+		apt_pkgs+=(make) dnf_pkgs+=(make) brew_pkgs+=(make)
+	fi
+	if [ $need_cc -eq 1 ]; then
+		# Homebrew's gcc bundles its own headers, so it needs no libc package.
+		apt_pkgs+=(gcc libc6-dev) dnf_pkgs+=(gcc glibc-devel) brew_pkgs+=(gcc)
+	fi
+	if [ $need_zsh -eq 1 ]; then
+		apt_pkgs+=(zsh) dnf_pkgs+=(zsh) brew_pkgs+=(zsh)
+	fi
+
 	if command -v apt-get >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
-		log "installing ${missing[*]}"
-		sudo -n apt-get update -qq || log "apt-get update failed; continuing"
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}" ||
-			log "install failed; run: sudo apt-get install -y ${missing[*]}"
+		say "installing ${apt_pkgs[*]}"
+		sudo -n apt-get update -qq || warn "apt-get update failed; continuing"
+		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y "${apt_pkgs[@]}" ||
+			warn "install failed; run: sudo apt-get install -y ${apt_pkgs[*]}"
+	elif command -v brew >/dev/null 2>&1; then
+		# The path for immutable distros such as Bazzite, where Homebrew is the
+		# recommended way to get CLI tooling and needs no root and no reboot.
+		say "installing ${brew_pkgs[*]} via Homebrew"
+		brew install "${brew_pkgs[@]}" ||
+			warn "install failed; run: brew install ${brew_pkgs[*]}"
+	elif command -v rpm-ostree >/dev/null 2>&1; then
+		# Never layer automatically: rpm-ostree builds a new deployment and the
+		# packages only appear after a reboot, which no `chezmoi apply` should
+		# trigger on the user's behalf.
+		warn "missing ${dnf_pkgs[*]} on an immutable system. Either:"
+		warn "  brew install ${brew_pkgs[*]}      (no reboot, recommended)"
+		warn "  sudo rpm-ostree install ${dnf_pkgs[*]}   (needs a reboot)"
+	elif command -v dnf >/dev/null 2>&1; then
+		warn "missing ${dnf_pkgs[*]} — run: sudo dnf install -y ${dnf_pkgs[*]}"
 	else
-		log "missing ${missing[*]} — run: sudo apt-get install -y ${missing[*]}"
+		warn "missing ${apt_pkgs[*]} — install them with your package manager"
 	fi
 fi
 
@@ -35,13 +75,15 @@ fi
 zsh_path="$(command -v zsh 2>/dev/null || true)"
 if [ -n "$zsh_path" ] && [ "${SHELL:-}" != "$zsh_path" ]; then
 	if sudo -n true 2>/dev/null; then
+		# chsh refuses shells that are not in /etc/shells, which is where a
+		# Homebrew zsh will trip; the .bash_profile fallback covers that.
 		if sudo -n chsh -s "$zsh_path" "$(id -un)" 2>/dev/null; then
-			log "login shell set to $zsh_path"
+			say "login shell set to $zsh_path"
 		else
-			log "could not set login shell; run: chsh -s $zsh_path"
+			warn "could not set login shell; run: chsh -s $zsh_path"
 		fi
 	else
-		log "login shell is ${SHELL:-unset}; .bash_profile will exec zsh instead"
+		warn "login shell is ${SHELL:-unset}; .bash_profile will exec zsh instead"
 	fi
 fi
 

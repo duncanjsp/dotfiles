@@ -2,15 +2,20 @@
 #!/bin/bash
 set -euo pipefail
 
+{{ template "lib/output.sh" . }}
+
+header "Homebrew packages"
+
 if ! command -v brew >/dev/null 2>&1; then
+	say "installing Homebrew"
 	NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 	eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+say "installing {{ len .packages.brews }} formulae"
 brew bundle install --file=- <<'BREWFILE'
 {{ range .packages.brews -}}
 brew "{{ . }}"
 {{ end -}}
-cask "{{ .font.cask }}"
 BREWFILE
 {{- end -}}

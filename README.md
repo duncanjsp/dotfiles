@@ -2,18 +2,50 @@
 
 These are my dotfiles, which are managed by [chezmoi](https://www.chezmoi.io/).
 
-### Profiles
+### Machine axes
 
-A `profile` is computed once, at `chezmoi init`, and drives every conditional:
+Three independent facts describe a machine, computed once at `chezmoi init`.
+Every conditional keys off exactly one of them:
 
-| Profile    | Detected by           | Tooling  | Signing |
-| ---------- | --------------------- | -------- | ------- |
-| `personal` | hostname `fantasmic`  | Homebrew | yes     |
-| `work`     | hostname `test-track` | Homebrew | yes     |
-| `server`   | any Linux host        | mise     | no      |
+| Axis          | Values               | Drives                                                |
+| ------------- | -------------------- | ----------------------------------------------------- |
+| `profile`     | `personal` / `work`  | git identity, signing key, work remotes, encrypted blob |
+| `.chezmoi.os` | `darwin` / `linux`   | package manager, platform binary paths                 |
+| `gui`         | `true` / `false`     | Ghostty, herdr, Zed, commit signing                    |
 
-Servers additionally skip all GUI configuration (Ghostty, herdr, Zed) and never
-decrypt anything, so they need neither the 1Password CLI nor the age key.
+Which gives:
+
+| Machine       | profile    | os       | gui   | Tooling  | Signing |
+| ------------- | ---------- | -------- | ----- | -------- | ------- |
+| `fantasmic`   | `personal` | `darwin` | yes   | Homebrew | yes     |
+| `test-track`  | `work`     | `darwin` | yes   | Homebrew | yes     |
+| Linux desktop | `personal` | `linux`  | yes   | mise     | yes     |
+| Linux server  | `personal` | `linux`  | no    | mise     | no      |
+
+A server is not a profile: it is Linux with `gui = false`. Keeping the axes
+separate is what lets a personal Linux desktop exist without every conditional
+growing a new case.
+
+Signing follows the GUI axis rather than the OS, because it is done by the
+1Password desktop app — a headless box has no `op-ssh-sign` to call. Only the
+binary's path varies by platform.
+
+Work is exactly one Mac, so only that machine ever decrypts anything; nothing
+else needs the 1Password CLI or the age key.
+
+### Packages
+
+`.chezmoidata/packages.yaml` holds two lists, one per backend. macOS uses
+Homebrew; Linux uses mise, which is user-local, needs no sudo and behaves
+identically on Debian-based and immutable distros — so desktops and servers
+share it rather than splitting on the distro's package manager. The mise list
+is split into `core` and `gui`, the latter being desktop-only.
+
+Tools are declared even when something else would drag them in: `tree-sitter`
+arrives as a Homebrew dependency of neovim and `node@20` as a dependency of
+other formulae, but both are used directly. Leaning on a transitive dependency
+is exactly how `ripgrep` — which Telescope's live grep needs — stayed
+undeclared until a server, with no Mac drift to hide behind, exposed it.
 
 ### Typeface
 
@@ -44,27 +76,56 @@ Themes that aren't built into a tool are vendored next to its config:
 `dot_config/ghostty/themes/dracula-pro` and `dot_config/zed/themes/`. Zed
 installs its theme extension itself via `auto_install_extensions`.
 
-### Bootstrapping a server
+### Bootstrapping a Linux box
 
-The repo is public and servers pull anonymously over HTTPS, so no credentials,
-SSH key or 1Password access are required.
+The repo is public and pulls anonymously over HTTPS, so no credentials, SSH key
+or 1Password access are required.
 
 ```sh
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply duncanjsp
 ```
 
-`run_before_05-server-prereqs.sh` handles the rest where it can. It installs
-`make`, `gcc` and `libc6-dev` — nvim-treesitter builds parsers with `cc` and
-`telescope-fzf-native` compiles C, so a compiler is required; `build-essential`
-is deliberately avoided as it also pulls in `g++` and `dpkg-dev`. It then sets
-zsh as the login shell.
+Unknown hosts are asked once whether they are a desktop. The default is `no`,
+so a non-interactive server bootstrap lands on the safe answer.
 
-All of that needs root, so it runs under `sudo -n` and never prompts: with
-passwordless sudo it just works, otherwise it prints the commands to run and
-carries on. `git` and `curl` are assumed present — the bootstrap line above
-cannot run without them.
+`run_before_05-linux-prereqs.sh` handles what needs root. It installs `make`
+and a C compiler — nvim-treesitter builds parsers with `cc` and
+`telescope-fzf-native` compiles C — plus zsh, then makes zsh the login shell.
+`build-essential` and `@development-tools` are deliberately avoided: both drag
+in `g++` and packaging tooling that nothing here uses.
 
-If the login shell could not be changed, `.bash_profile` execs into zsh for
-interactive logins instead, so either route lands you in the right shell.
+This is the only script that has to know about more than one package manager,
+because everything else comes from mise. It tries, in order:
+
+| Condition                    | Action                                            |
+| ---------------------------- | ------------------------------------------------- |
+| `apt-get` + passwordless sudo | installs `make gcc libc6-dev zsh`                 |
+| Homebrew present             | installs `make gcc zsh` — the immutable-distro path |
+| `rpm-ostree` present         | prints both options, changes nothing               |
+| `dnf` present                | prints the command                                 |
+| none of the above            | prints what is missing                            |
+
+On atomic distros such as Bazzite, `rpm-ostree install` builds a new deployment
+that only takes effect after a reboot, so it is never run automatically — no
+`chezmoi apply` should reboot a machine on your behalf. Homebrew is Bazzite's
+own recommendation for CLI tooling and needs neither root nor a reboot, which
+is why it is preferred there.
+
+Everything runs under `sudo -n` and never prompts: with passwordless sudo it
+just works, otherwise it prints the commands and carries on. `git` and `curl`
+are assumed present — the bootstrap line above cannot run without them.
+
+If the login shell could not be changed — `chsh` also refuses shells missing
+from `/etc/shells`, which is where a Homebrew zsh trips — `.bash_profile` execs
+into zsh for interactive logins instead, so either route lands you in the right
+shell.
 
 Subsequent updates are `chezmoi update`.
+
+### Script output
+
+The `run_` scripts share `.chezmoitemplates/lib/output.sh`, which uses
+[gum](https://github.com/charmbracelet/gum) when it is available and falls back
+to plain `printf` when it is not. Both fallbacks matter: gum is installed *by*
+these scripts, so the first run on a new machine happens before it exists, and
+`chezmoi apply` over SSH has no TTY for it to draw on.

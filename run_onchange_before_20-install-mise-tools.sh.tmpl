@@ -5,17 +5,22 @@
 # and immutable distros alike. See .chezmoidata/packages.yaml.
 set -eo pipefail
 
+{{ template "lib/output.sh" . }}
+
+header "CLI tools"
+
 if ! command -v mise >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/mise" ]; then
+	say "installing mise"
 	curl -fsSL https://mise.run | sh
 fi
 
 MISE="$(command -v mise || echo "$HOME/.local/bin/mise")"
-if [ ! -x "$MISE" ]; then
-	echo "mise not available at $MISE; cannot install tools" >&2
-	exit 1
-fi
+[ -x "$MISE" ] || die "mise not available at $MISE; cannot install tools"
 
+{{ $tools := .packages.mise.core -}}
+{{ if .gui }}{{ $tools = concat $tools .packages.mise.gui }}{{ end -}}
+say "installing {{ len $tools }} tools"
 "$MISE" use --global --yes \
-{{ range $i, $tool := .packages.mise }}	{{ $tool | quote }}{{ if lt (add1 $i) (len $.packages.mise) }} \{{ end }}
+{{ range $i, $tool := $tools }}	{{ $tool | quote }}{{ if lt (add1 $i) (len $tools) }} \{{ end }}
 {{ end }}
 {{ end -}}
