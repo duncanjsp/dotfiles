@@ -9,6 +9,9 @@ set -eo pipefail
 
 OP_REF="op://Private/Chezmoi encryption/age key/private key"
 
+# Account UUID for the stevenson-price family account.
+OP_ACCOUNT="${OP_ACCOUNT:-353UNSKZKJHK5FKSKUOTREIGEA}"
+
 # Drop any --identity chezmoi passes; we supply our own on a file descriptor.
 args=()
 skip=0
@@ -37,7 +40,7 @@ if [ "$decrypt" -eq 1 ]; then
 		echo "age-op: 1Password CLI (op) not found; cannot fetch age identity" >&2
 		exit 1
 	fi
-	exec age "${args[@]}" -i <(op read "$OP_REF")
+	exec age "${args[@]}" -i <(op read --account "$OP_ACCOUNT" "$OP_REF")
 fi
 
 exec age "${args[@]}"
