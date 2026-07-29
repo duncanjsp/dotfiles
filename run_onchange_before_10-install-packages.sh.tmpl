@@ -11,5 +11,6 @@ brew bundle install --file=- <<'BREWFILE'
 {{ range .packages.brews -}}
 brew "{{ . }}"
 {{ end -}}
+cask "{{ .font.cask }}"
 BREWFILE
 {{- end -}}

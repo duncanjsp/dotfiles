@@ -50,7 +50,7 @@
 	{{- end }}
 	"ui_font_size": 16,
 	"buffer_font_size": 16,
-	"buffer_font_family": "JetBrainsMono Nerd Font",
+	"buffer_font_family": "{{ .font.family }}",
 	"tab_size": 3,
 	"theme": {
 		"mode": "system",
@@ -59,7 +59,7 @@
 	},
 	"terminal": {
 		"font_size": 13,
-		"font_family": "JetBrainsMono Nerd Font",
+		"font_family": "{{ .font.family }}",
 		"line_height": "standard"
 	},
 	"show_whitespaces": "boundary",

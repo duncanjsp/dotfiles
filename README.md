@@ -15,6 +15,12 @@ A `profile` is computed once, at `chezmoi init`, and drives every conditional:
 Servers additionally skip all GUI configuration (Ghostty, herdr, Zed) and never
 decrypt anything, so they need neither the 1Password CLI nor the age key.
 
+### Typeface
+
+The font lives in one place, `.chezmoidata/fonts.yaml`: `cask` is what the
+package script installs, `family` is interpolated into Ghostty and Zed. Change
+those two values and `chezmoi apply` to switch typeface everywhere.
+
 ### Bootstrapping a server
 
 The repo is public and servers pull anonymously over HTTPS, so no credentials,

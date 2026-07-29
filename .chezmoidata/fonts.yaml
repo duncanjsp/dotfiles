@@ -1,0 +1,8 @@
+# Single source of truth for my typeface of choice to
+# avoiding having to set it everywhere.
+font:
+  # Homebrew cask for typeface installation.
+  cask: font-maple-mono-nf
+  # Font family passed to the tools. Remember NerdFont
+  # varient for pretty glyphs!
+  family: Maple Mono NF
