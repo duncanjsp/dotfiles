@@ -8,7 +8,12 @@ export XDG_STATE_HOME=$HOME/.local/state
 if [ "$(uname)" = "Linux" ]; then
   export XDG_RUNTIME_DIR="/run/user/$UID"
 else
-  export XDG_RUNTIME_DIR="${TMPDIR}xdg-runtime-$UID"
+  # TMPDIR is normally the per-user /var/folders/.../T/ with a trailing slash,
+  # but not always (some launch contexts hand down a bare /private/tmp), so
+  # normalise rather than assuming the separator is there.
+  _tmpdir="${TMPDIR:-/tmp}"
+  export XDG_RUNTIME_DIR="${_tmpdir%/}/xdg-runtime-$UID"
+  unset _tmpdir
 fi
 
 # Ensure XDG_RUNTIME_DIR exists
