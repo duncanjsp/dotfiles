@@ -1,0 +1,17 @@
+{{- $nvim := (index .themes .theme).nvim -}}
+-- Generated from .chezmoidata/theme.yaml — edit the theme there, not here.
+-- https://github.com/{{ $nvim.plugin }}
+return {
+  "{{ $nvim.plugin }}",
+  name = "{{ $nvim.lazy_name }}",
+  lazy = false,
+  priority = 1000,
+  config = function()
+    require("{{ $nvim.module }}").setup({
+{{- if $nvim.flavour }}
+      flavour = "{{ $nvim.flavour }}",
+{{- end }}
+    })
+    vim.cmd.colorscheme("{{ $nvim.colorscheme }}")
+  end,
+}

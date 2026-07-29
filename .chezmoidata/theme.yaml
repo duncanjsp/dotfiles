@@ -1,0 +1,73 @@
+# Single source of truth for the colour scheme. Point `theme` at any key in
+# `themes` and re-apply: Ghostty, bat, herdr, Zed, Neovim and the oh-my-posh
+# palette all follow from that one line.
+#
+# eza, fastfetch and atuin are deliberately absent. They render in terminal
+# ANSI, so they inherit whatever Ghostty's theme sets and need no config.
+theme: catppuccin-mocha
+
+themes:
+  catppuccin-mocha:
+    # Built into Ghostty and bat already; `ghostty +list-themes`, `bat
+    # --list-themes`. herdr's built-in name has no flavour suffix.
+    ghostty: Catppuccin Mocha
+    bat: Catppuccin Mocha
+    herdr: catppuccin
+    zed:
+      name: Catppuccin Mocha
+      # Zed installs this itself on launch via auto_install_extensions.
+      extension: catppuccin
+    nvim:
+      plugin: catppuccin/nvim
+      # lazy.nvim names a plugin after its repo, which here is just "nvim".
+      lazy_name: catppuccin
+      module: catppuccin
+      colorscheme: catppuccin
+      flavour: mocha
+    # oh-my-posh slots are keyed by role, not by hue, so a theme is free to
+    # pick whatever colour suits a role. One invariant holds across every
+    # theme: coloured backgrounds always pair with fg_on_accent, and
+    # transparent backgrounds always take a light accent as their foreground.
+    # Breaking it is what produced pale-grey-on-pale-peach.
+    palette:
+      fg_on_accent: "#11111b" # crust
+      fg_plain: "#cdd6f4" # text
+      accent: "#cba6f7" # mauve — session
+      remote: "#89dceb" # sky — SSH session
+      path: "#89b4fa" # blue
+      ok: "#a6e3a1" # green — clean tree
+      warn: "#fab387" # peach — dirty tree
+      error: "#f38ba8" # red — failures, root
+      info: "#74c7ec" # sapphire — status, ahead
+      behind: "#f5c2e7" # pink
+
+  dracula-pro:
+    # Dracula Pro is paid and built into nothing, so Ghostty and Zed read
+    # vendored theme files from their own themes/ directories. Everything else
+    # falls back to the free Dracula.
+    ghostty: dracula-pro
+    bat: Dracula
+    herdr: dracula
+    zed:
+      name: Dracula Pro
+      extension: ""
+    nvim:
+      plugin: Mofiqul/dracula.nvim
+      lazy_name: dracula.nvim
+      module: dracula
+      colorscheme: dracula
+      flavour: ""
+    # ahead/behind were dark purples with light text before the roles existed.
+    # They are light here so the fg_on_accent invariant holds for this theme
+    # too, which is what lets both entries share one set of segments.
+    palette:
+      fg_on_accent: "#262B44"
+      fg_plain: "#E0DEF4"
+      accent: "#F3AE35"
+      remote: "#4B95E9"
+      path: "#F07623"
+      ok: "#59C9A5"
+      warn: "#F3AE35"
+      error: "#D81E5B"
+      info: "#80FFEA"
+      behind: "#FF80BF"

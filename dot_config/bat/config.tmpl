@@ -3,8 +3,8 @@
 # run `bat --help` to get a list of all possible configuration options.
 
 # Specify desired highlighting theme (e.g. "TwoDark"). Run `bat --list-themes`
-# for a list of all available themes
---theme="Dracula"
+# for a list of all available themes. Set from .chezmoidata/theme.yaml.
+--theme={{ (index .themes .theme).bat | quote }}
 
 # Syntax mappings: map a certain filename pattern to a language.
 #   Example 1: use the C++ syntax for Arduino .ino files

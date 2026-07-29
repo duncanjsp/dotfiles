@@ -1,8 +1,12 @@
+# herdr writes this back itself once onboarding has been dismissed. Declaring
+# it here stops chezmoi and herdr from overwriting each other on every apply.
+onboarding = false
+
 [ui.toast]
 delivery = "herdr"
 
 [theme]
-name = "dracula"
+name = {{ (index .themes .theme).herdr | quote }}
 auto_switch = false
 
 [experimental]

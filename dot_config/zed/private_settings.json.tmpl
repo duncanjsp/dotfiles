@@ -52,10 +52,16 @@
 	"buffer_font_size": 16,
 	"buffer_font_family": "{{ .font.family }}",
 	"tab_size": 3,
+	{{- $zed := (index .themes .theme).zed }}
+	{{- if $zed.extension }}
+	"auto_install_extensions": {
+		{{ $zed.extension | quote }}: true
+	},
+	{{- end }}
 	"theme": {
 		"mode": "system",
-		"light": "Dracula Pro",
-		"dark": "Dracula Pro"
+		"light": {{ $zed.name | quote }},
+		"dark": {{ $zed.name | quote }}
 	},
 	"terminal": {
 		"font_size": 13,
