@@ -74,16 +74,30 @@ fi
 # prompt; when that is unavailable, .bash_profile execs into zsh instead.
 zsh_path="$(command -v zsh 2>/dev/null || true)"
 if [ -n "$zsh_path" ] && [ "${SHELL:-}" != "$zsh_path" ]; then
-	if sudo -n true 2>/dev/null; then
-		# chsh refuses shells that are not in /etc/shells, which is where a
-		# Homebrew zsh will trip; the .bash_profile fallback covers that.
-		if sudo -n chsh -s "$zsh_path" "$(id -un)" 2>/dev/null; then
-			say "login shell set to $zsh_path"
-		else
-			warn "could not set login shell; run: chsh -s $zsh_path"
-		fi
+	# chsh is not universal: on Fedora and derivatives it ships in
+	# util-linux-user, which minimal and atomic images leave out, and on slim
+	# Debian images it is in passwd. usermod comes from shadow-utils and is far
+	# more often present. It also skips the /etc/shells check that chsh applies,
+	# which a Homebrew zsh would otherwise fail.
+	if command -v chsh >/dev/null 2>&1; then
+		set_shell="chsh -s $zsh_path $(id -un)"
+	elif command -v usermod >/dev/null 2>&1; then
+		set_shell="usermod -s $zsh_path $(id -un)"
 	else
+		set_shell=""
+	fi
+
+	if [ -z "$set_shell" ]; then
+		warn "no chsh or usermod available; .bash_profile will exec zsh instead"
+	elif ! sudo -n true 2>/dev/null; then
+		# Report the command that will actually work on *this* box, rather than
+		# naming a tool that may not be installed.
 		warn "login shell is ${SHELL:-unset}; .bash_profile will exec zsh instead"
+		warn "to change it for real: sudo $set_shell"
+	elif sudo -n $set_shell 2>/dev/null; then
+		say "login shell set to $zsh_path"
+	else
+		warn "could not set login shell; run: sudo $set_shell"
 	fi
 fi
 
