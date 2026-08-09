@@ -5,8 +5,8 @@ name = "Duncan Stevenson-Price"
 email = "{{ .email }}"
 
 [signing]
-{{- /* Without the 1Password desktop app "own" would make every jj command fail,
-       not just commits, because signing happens on working-copy snapshots. */}}
+{{- /* "own" would fail every jj command, not just commits: signing happens on
+       working-copy snapshots. */}}
 behavior = {{ if .gui }}"own"{{ else }}"drop"{{ end }}
 backend = "ssh"
 {{- if eq .profile "work" }}

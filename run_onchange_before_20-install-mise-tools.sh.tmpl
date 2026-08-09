@@ -1,8 +1,7 @@
 {{- if eq .chezmoi.os "linux" -}}
 #!/bin/bash
-# Linux gets its CLI tools from mise rather than Homebrew: user-local, no sudo,
-# no shadowing of the distro's git/curl/openssl, and identical on Debian-based
-# and immutable distros alike. See .chezmoidata/packages.yaml.
+# Tools come from mise rather than Homebrew: user-local, no sudo, and the same
+# on Debian-based and immutable distros. See .chezmoidata/packages.yaml.
 set -eo pipefail
 
 {{ template "lib/output.sh" . }}

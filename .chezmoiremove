@@ -1,11 +1,5 @@
-# Targets to delete on apply.
-#
-# fantasmic.zsh and test-track.zsh were renamed to personal.zsh and work.zsh.
-# chezmoi leaves a file behind when it stops managing it, and .zshrc sources
-# every *.zsh in that directory, so without this the old copy would keep being
-# loaded alongside the new one.
-#
-# Safe to delete this file once both Macs have applied once; removing a path
-# that is already gone is a no-op.
+# Renamed to personal.zsh and work.zsh. chezmoi leaves unmanaged files in
+# place, and .zshrc sources every *.zsh in that directory.
+# Safe to delete this file once both Macs have applied.
 .config/zsh/resources/fantasmic.zsh
 .config/zsh/resources/test-track.zsh

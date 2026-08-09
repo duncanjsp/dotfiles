@@ -13,29 +13,17 @@ export PATH="$HOME/.local/bin:$PATH"
 # over EDITOR, which would open Zed from the terminal. Use `zed {file}` directly.
 export EDITOR="nvim"
 
-# Anything that spawns "the user's shell" reads $SHELL, which login sets from
-# /etc/passwd — so it still says bash on a box where chsh could not run, and
-# herdr then opens its panes in bash with no prompt. We are demonstrably in zsh
-# by this point, so say so. A no-op where the login shell is already correct.
+# $SHELL comes from /etc/passwd, so it still says bash where chsh could not
+# run — and anything spawning "the user's shell" (herdr's panes) then gets bash.
 [[ -n "${commands[zsh]}" ]] && export SHELL="${commands[zsh]}"
 
-# Tools are guarded so a shell still starts on a box where one is missing or
-# mise has not finished installing them yet.
-
-# Mise must come first: on Linux every tool below is provided by mise, and
-# nothing resolves on PATH until this runs. (On the Macs Homebrew has already
-# put them on PATH via .zprofile, which is why order looks irrelevant there.)
-# Load Mise https://mise.jdx.dev/
+# Mise must come first: on Linux every tool below comes from mise and nothing
+# resolves on PATH until this runs. https://mise.jdx.dev/
 command -v mise >/dev/null && eval "$(mise activate zsh)"
 {{ if .gui }}
-# Launch herdr, but not in the Ghostty quick terminal and not over SSH: a
-# remote shell should land at a plain prompt, and herdr is a `h` away if wanted.
-#
-# This has to sit after mise activation: on Linux herdr is a mise-managed tool
-# and is not on PATH before it. The command -v guard is load-bearing for the
-# same reason — a bare `exec` of a missing command exits zsh outright rather
-# than falling through to `|| exit`, so a terminal would open and immediately
-# close. Being here also avoids initialising a prompt we are about to replace.
+# Must follow mise activation: on Linux herdr comes from mise. The guard
+# matters too — a bare `exec` of a missing command exits zsh outright rather
+# than falling through to `|| exit`, closing the terminal.
 if [[ -z "$HERDR_ENV" && -z "$SSH_CONNECTION" && "$GHOSTTY_QUICK_TERMINAL" != "1" ]] && command -v herdr >/dev/null; then
 	exec herdr || exit
 fi

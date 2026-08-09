@@ -1,22 +1,20 @@
 {{- if eq .chezmoi.os "linux" -}}
 #!/bin/bash
-# Linux prerequisites that need root: a C toolchain (nvim-treesitter builds
-# parsers with cc, telescope-fzf-native compiles C) and zsh as the login shell.
-# Every Linux box needs these, desktop or headless — nvim is the same either way.
+# Installs make, a C compiler and zsh, then makes zsh the login shell.
+# nvim-treesitter builds parsers with cc and telescope-fzf-native compiles C.
 #
-# Runs on every apply but exits immediately once satisfied. Uses `sudo -n`
-# throughout so it can never sit waiting for a password and hang an apply over
-# SSH; where it cannot act, it prints the command to run and continues.
-#
-# Everything else comes from mise, which is distro-agnostic. This script is the
-# only place the distro matters, which is why it is the only place that has to
-# know about more than one package manager.
+# Uses sudo -n throughout so it can never wait for a password and hang an apply
+# over SSH; where it cannot act it prints the command and continues.
 set -o pipefail
 
 {{ template "lib/output.sh" . }}
 
-# What is actually missing, expressed as needs rather than package names: the
-# names differ per distro but the requirements do not.
+# zsh does not read /etc/profile.d, so a brew installed by an earlier run is not
+# on PATH when chezmoi is invoked from zsh, and its packages look missing.
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
 need_make=0
 need_cc=0
 need_zsh=0
@@ -29,8 +27,8 @@ command -v zsh >/dev/null 2>&1 || need_zsh=1
 if [ $((need_make + need_cc + need_zsh)) -gt 0 ]; then
 	header "Build prerequisites"
 
-	# Deliberately not build-essential or @development-tools: those add g++ and
-	# packaging tooling that nothing here uses.
+	# Not build-essential or @development-tools: both add g++ and packaging
+	# tooling that nothing here uses.
 	apt_pkgs=()
 	dnf_pkgs=()
 	brew_pkgs=()
@@ -51,15 +49,12 @@ if [ $((need_make + need_cc + need_zsh)) -gt 0 ]; then
 		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y "${apt_pkgs[@]}" ||
 			warn "install failed; run: sudo apt-get install -y ${apt_pkgs[*]}"
 	elif command -v brew >/dev/null 2>&1; then
-		# The path for immutable distros such as Bazzite, where Homebrew is the
-		# recommended way to get CLI tooling and needs no root and no reboot.
 		say "installing ${brew_pkgs[*]} via Homebrew"
 		brew install "${brew_pkgs[@]}" ||
 			warn "install failed; run: brew install ${brew_pkgs[*]}"
 	elif command -v rpm-ostree >/dev/null 2>&1; then
 		# Never layer automatically: rpm-ostree builds a new deployment and the
-		# packages only appear after a reboot, which no `chezmoi apply` should
-		# trigger on the user's behalf.
+		# packages only appear after a reboot.
 		warn "missing ${dnf_pkgs[*]} on an immutable system. Either:"
 		warn "  brew install ${brew_pkgs[*]}      (no reboot, recommended)"
 		warn "  sudo rpm-ostree install ${dnf_pkgs[*]}   (needs a reboot)"
@@ -70,15 +65,11 @@ if [ $((need_make + need_cc + need_zsh)) -gt 0 ]; then
 	fi
 fi
 
-# Make zsh the login shell. Needs root to edit /etc/passwd without a password
-# prompt; when that is unavailable, .bash_profile execs into zsh instead.
 zsh_path="$(command -v zsh 2>/dev/null || true)"
 if [ -n "$zsh_path" ] && [ "${SHELL:-}" != "$zsh_path" ]; then
-	# chsh is not universal: on Fedora and derivatives it ships in
-	# util-linux-user, which minimal and atomic images leave out, and on slim
-	# Debian images it is in passwd. usermod comes from shadow-utils and is far
-	# more often present. It also skips the /etc/shells check that chsh applies,
-	# which a Homebrew zsh would otherwise fail.
+	# chsh is not everywhere: Fedora ships it in util-linux-user and slim Debian
+	# images in passwd. usermod comes from shadow-utils and also skips the
+	# /etc/shells check that a Homebrew zsh would fail.
 	if command -v chsh >/dev/null 2>&1; then
 		set_shell="chsh -s $zsh_path $(id -un)"
 	elif command -v usermod >/dev/null 2>&1; then
@@ -90,8 +81,6 @@ if [ -n "$zsh_path" ] && [ "${SHELL:-}" != "$zsh_path" ]; then
 	if [ -z "$set_shell" ]; then
 		warn "no chsh or usermod available; .bash_profile will exec zsh instead"
 	elif ! sudo -n true 2>/dev/null; then
-		# Report the command that will actually work on *this* box, rather than
-		# naming a tool that may not be installed.
 		warn "login shell is ${SHELL:-unset}; .bash_profile will exec zsh instead"
 		warn "to change it for real: sudo $set_shell"
 	elif sudo -n $set_shell 2>/dev/null; then

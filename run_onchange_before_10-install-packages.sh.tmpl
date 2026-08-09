@@ -12,10 +12,14 @@ if ! command -v brew >/dev/null 2>&1; then
 	eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-say "installing {{ len .packages.brews }} formulae"
+say "installing {{ add (len .packages.brews) (len .packages.casks) 1 }} packages"
 brew bundle install --file=- <<'BREWFILE'
 {{ range .packages.brews -}}
 brew "{{ . }}"
 {{ end -}}
+{{ range .packages.casks -}}
+cask "{{ . }}"
+{{ end -}}
+cask "{{ .font.cask }}"
 BREWFILE
 {{- end -}}

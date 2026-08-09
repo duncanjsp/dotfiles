@@ -1,21 +1,16 @@
 packages:
-  # macOS: Homebrew. Both Macs in this fleet are desktops, so there is no
-  # headless variant to split out.
-  #
-  # tree-sitter and node@20 arrive as dependencies of neovim and of other
-  # formulae respectively, but both are used directly — nvim-treesitter shells
-  # out to the tree-sitter CLI, and .zshrc puts node@20 on PATH — so they are
-  # declared rather than left to chance. Relying on a transitive dependency is
-  # what let ripgrep go undeclared until a server exposed it.
   brews:
     - atuin
     - bat
     - carapace
+    - chezmoi
     - direnv
     - eza
     - fastfetch
     - fd
+    - gh
     - git
+    - go
     - gum
     - herdr
     - jandedobbeleer/oh-my-posh/oh-my-posh
@@ -26,25 +21,28 @@ packages:
     - prettier
     - ripgrep
     - stylua
+    # Used directly by nvim-treesitter, not just as a neovim dependency.
     - tree-sitter
     - umputun/apps/revdiff
-  # Linux: mise. User-local, needs no sudo, and behaves identically on
-  # Debian-based and immutable distros — which is why desktops and servers share
-  # it rather than splitting on the distro's package manager.
+  casks:
+    - 1password-cli
+  # Linux uses mise: user-local, no sudo, and the same on Debian-based and
+  # immutable distros alike.
   #
-  # Omits git (comes from the distro) and mise (installs itself).
-  # neovim@latest resolves to nightly, hence the explicit @stable.
-  # eza and revdiff are absent from mise's registry but publish Linux binaries
-  # on GitHub, so they come from releases via ubi. (revdiff's Homebrew tap ships
-  # no bottles, which is a fact about the tap, not about the project.)
+  # Omits git (from the distro) and mise (installs itself). neovim@latest
+  # resolves to nightly, hence @stable. eza and revdiff are not in mise's
+  # registry but publish Linux binaries, so they come from releases via ubi.
   mise:
     core:
       - atuin@latest
       - bat@latest
       - carapace@latest
+      - chezmoi@latest
       - direnv@latest
       - fastfetch@latest
       - fd@latest
+      - gh@latest
+      - go@latest
       - gum@latest
       - jj@latest
       - neovim@stable
@@ -56,7 +54,5 @@ packages:
       - tree-sitter@latest
       - ubi:eza-community/eza@latest
       - ubi:umputun/revdiff@latest
-    # Desktops only: herdr is a terminal-multiplexer workflow that only makes
-    # sense where a terminal emulator is running.
     gui:
       - herdr@latest

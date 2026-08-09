@@ -1,13 +1,9 @@
-{{- /* Ghostty key routing for herdr. Each binding sends herdr's prefix (\x02,
-       i.e. ctrl-b) plus a command character, or a CSI u sequence; Ghostty's own
-       binding for the same chord is unbound so it does not steal the key.
+{{- /* Bindings send herdr's prefix (\x02) plus a command character; Ghostty's
+       own binding for the same chord is unbound so it does not steal the key.
 
-       The macOS half is what `native-shortcuts-herd install` generated. The
-       Linux half mirrors it with cmd -> ctrl+shift, the conventional Linux
-       terminal equivalent. super is deliberately avoided: desktop environments
-       grab it for window management, so those chords would never reach the
-       terminal. Section order matches the generated file so the macOS output
-       stays byte-identical to it. */ -}}
+       Linux mirrors macOS with cmd -> ctrl+shift. super is avoided because
+       desktop environments grab it. Section order matches what
+       `native-shortcuts-herd install` generates. */ -}}
 # native-shortcuts-herd: managed ghostty key routing
 # edit with: native-shortcuts-herd install
 {{ if eq .chezmoi.os "darwin" }}
@@ -41,8 +37,7 @@ keybind = ctrl+shift+KeyL=text:\x02T
 keybind = ctrl+shift+l=unbind
 keybind = ctrl+shift+KeyD=text:\x02v
 keybind = ctrl+shift+d=unbind
-# cmd+shift+d has no ctrl+shift+shift counterpart, so the second split moves to
-# ctrl+alt+d rather than colliding with the first.
+# cmd+shift+d has no ctrl+shift+shift counterpart.
 keybind = ctrl+alt+KeyD=text:\x02-
 keybind = ctrl+alt+d=unbind
 keybind = alt+t=text:\x02t

@@ -1,6 +1,7 @@
 {{ if eq .chezmoi.os "darwin" -}}
 eval "$(/opt/homebrew/bin/brew shellenv)"
 {{- else -}}
-# Servers use mise (activated in .zshrc) rather than Homebrew; mise-managed
-# binaries are reached via its shims, and ~/.local/bin is added there too.
+# zsh does not read /etc/profile.d, where Bazzite and friends put brew's
+# shellenv, so brew-installed binaries are otherwise invisible from zsh.
+[ -x /home/linuxbrew/.linuxbrew/bin/brew ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 {{- end }}

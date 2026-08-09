@@ -27,9 +27,7 @@
 	program = {{ if eq .chezmoi.os "darwin" }}/Applications/1Password.app/Contents/MacOS/op-ssh-sign{{ else }}/opt/1Password/op-ssh-sign{{ end }}
 {{ end -}}
 [commit]
-{{- /* Signing is done by the 1Password desktop app, so it tracks the GUI axis
-       rather than the OS: a headless box has no op-ssh-sign to call and every
-       commit would fail. */}}
+{{- /* Signing needs the 1Password desktop app, so it tracks gui, not the OS. */}}
 	gpgsign = {{ .gui }}
 [push]
 	autoSetupRemote = true
