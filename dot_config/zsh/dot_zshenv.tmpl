@@ -1,3 +1,10 @@
+{{ if ne .chezmoi.os "darwin" -}}
+# Remote boxes often have no LANG; without one zsh mismeasures the prompt.
+case "${LANG:-}" in
+"" | C | POSIX) export LANG=C.UTF-8 ;;
+esac
+
+{{ end -}}
 # Configure XDG Base Directory
 export XDG_CONFIG_HOME=$HOME/.config
 export XDG_DATA_HOME=$HOME/.local/share
