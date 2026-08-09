@@ -1,0 +1,46 @@
+{{- if and (eq .chezmoi.os "linux") .gui -}}
+#!/bin/bash
+# Homebrew casks are macOS-only, so Linux fetches the font from upstream.
+set -eo pipefail
+
+{{ template "lib/output.sh" . }}
+
+url="https://github.com/{{ .font.repo }}/releases/download/{{ .font.version }}/{{ .font.asset }}"
+dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts/{{ .font.family }}"
+stamp="$dir/.version"
+
+if [ "$(cat "$stamp" 2>/dev/null)" = "{{ .font.version }}" ]; then
+	exit 0
+fi
+
+header "Font"
+say "installing {{ .font.family }} {{ .font.version }}"
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+curl -fsSL "$url" -o "$tmp/font.zip" || die "download failed: $url"
+
+want="$(curl -fsSL "${url%.zip}.sha256" 2>/dev/null | tr -d '[:space:]')"
+if [ -n "$want" ]; then
+	got="$(sha256sum "$tmp/font.zip" | cut -d' ' -f1)"
+	[ "$want" = "$got" ] || die "checksum mismatch for {{ .font.asset }}"
+fi
+
+rm -rf "$dir"
+mkdir -p "$dir"
+if command -v unzip >/dev/null 2>&1; then
+	unzip -qo "$tmp/font.zip" '*.ttf' -d "$dir"
+else
+	# unzip is not guaranteed; python3 is, on anything running a desktop.
+	python3 -m zipfile -e "$tmp/font.zip" "$dir"
+fi
+
+echo "{{ .font.version }}" >"$stamp"
+
+if command -v fc-cache >/dev/null 2>&1; then
+	fc-cache -f "$dir" >/dev/null
+else
+	warn "fc-cache not found; log out and back in to pick up the font"
+fi
+{{ end -}}

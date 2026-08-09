@@ -6,3 +6,7 @@ font:
   # Font family passed to the tools. Remember NerdFont
   # varient for pretty glyphs!
   family: Maple Mono NF
+  # Linux has no casks, so it fetches the same asset the cask uses.
+  repo: subframe7536/maple-font
+  version: v7.9
+  asset: MapleMono-NF-unhinted.zip
