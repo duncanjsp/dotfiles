@@ -12,21 +12,27 @@ export PATH="$HOME/.local/bin:$PATH"
 # nvim for all editor invocations. VISUAL is deliberately unset: tools prefer it
 # over EDITOR, which would open Zed from the terminal. Use `zed {file}` directly.
 export EDITOR="nvim"
-{{ if .gui }}
-# Launch herdr, except in the Ghostty quick terminal
-if [[ -z "$HERDR_ENV" && "$GHOSTTY_QUICK_TERMINAL" != "1" ]]; then
-	exec herdr || exit
-fi
-{{ end }}
+
 # Tools are guarded so a shell still starts on a box where one is missing or
 # mise has not finished installing them yet.
 
-# Mise must come first: on servers every tool below is provided by mise, and
+# Mise must come first: on Linux every tool below is provided by mise, and
 # nothing resolves on PATH until this runs. (On the Macs Homebrew has already
 # put them on PATH via .zprofile, which is why order looks irrelevant there.)
 # Load Mise https://mise.jdx.dev/
 command -v mise >/dev/null && eval "$(mise activate zsh)"
-
+{{ if .gui }}
+# Launch herdr, except in the Ghostty quick terminal.
+#
+# This has to sit after mise activation: on Linux herdr is a mise-managed tool
+# and is not on PATH before it. The command -v guard is load-bearing for the
+# same reason — a bare `exec` of a missing command exits zsh outright rather
+# than falling through to `|| exit`, so a terminal would open and immediately
+# close. Being here also avoids initialising a prompt we are about to replace.
+if [[ -z "$HERDR_ENV" && "$GHOSTTY_QUICK_TERMINAL" != "1" ]] && command -v herdr >/dev/null; then
+	exec herdr || exit
+fi
+{{ end }}
 # OhMyPosh Config https://ohmyposh.dev/docs/
 command -v oh-my-posh >/dev/null && eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/ohmyposh/config.toml)"
 
