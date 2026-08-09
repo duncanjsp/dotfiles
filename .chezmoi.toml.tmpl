@@ -1,11 +1,11 @@
 {{- /* Three axes: profile (personal|work), .chezmoi.os, and gui. A server is
-       Linux with gui = false rather than a profile of its own. */ -}}
+       Linux with gui = false rather than a profile of its own. Unknown hosts
+       default to gui = false so a scripted bootstrap is safe. */ -}}
 {{- $profile := "personal" -}}
 {{- $gui := true -}}
 {{- if eq .chezmoi.hostname "test-track" -}}
 {{-   $profile = "work" -}}
 {{- else if ne .chezmoi.hostname "fantasmic" -}}
-{{-   /* Defaults to false so a non-interactive server bootstrap is safe. */ -}}
 {{-   $gui = promptBoolOnce . "gui" "Desktop machine (install GUI configs)" false -}}
 {{- end -}}
 {{- $email := promptStringOnce . "email" "Email address" "duncan@psmail.co" -}}
