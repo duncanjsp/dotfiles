@@ -32,10 +32,11 @@ packages:
   # Debian-based and immutable distros — which is why desktops and servers share
   # it rather than splitting on the distro's package manager.
   #
-  # Omits git (comes from the distro), mise (installs itself) and revdiff (its
-  # tap ships no bottles, so it would need a Go toolchain to build).
+  # Omits git (comes from the distro) and mise (installs itself).
   # neovim@latest resolves to nightly, hence the explicit @stable.
-  # eza has no aqua backend in mise's registry, so it comes from releases.
+  # eza and revdiff are absent from mise's registry but publish Linux binaries
+  # on GitHub, so they come from releases via ubi. (revdiff's Homebrew tap ships
+  # no bottles, which is a fact about the tap, not about the project.)
   mise:
     core:
       - atuin@latest
@@ -54,6 +55,7 @@ packages:
       - stylua@latest
       - tree-sitter@latest
       - ubi:eza-community/eza@latest
+      - ubi:umputun/revdiff@latest
     # Desktops only: herdr is a terminal-multiplexer workflow that only makes
     # sense where a terminal emulator is running.
     gui:
