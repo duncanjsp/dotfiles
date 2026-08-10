@@ -4,9 +4,8 @@ case "${LANG:-}" in
 "" | C | POSIX) export LANG=C.UTF-8 ;;
 esac
 
-# Commit signing calls ssh-keygen, which finds its key via this socket. Only set
-# when empty: an ssh session with agent forwarding has already pointed it home.
-if [[ -z "${SSH_AUTH_SOCK:-}" && -S "$HOME/.1password/agent.sock" ]]; then
+# gnome-keyring grabs this but has no signing key. A forwarded agent wins.
+if [[ -z "${SSH_CONNECTION:-}" && -S "$HOME/.1password/agent.sock" ]]; then
 	export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
 fi
 
