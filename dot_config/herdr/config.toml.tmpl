@@ -2,8 +2,11 @@
 # it here stops chezmoi and herdr from overwriting each other on every apply.
 onboarding = false
 
+{{- $zsh := lookPath "zsh" }}
+{{- if $zsh }}
 [terminal]
-default_shell = "zsh"
+default_shell = {{ $zsh | quote }}
+{{- end }}
 
 [ui.toast]
 delivery = "herdr"
