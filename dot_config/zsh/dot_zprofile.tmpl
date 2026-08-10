@@ -1,7 +1,6 @@
 {{ if eq .chezmoi.os "darwin" -}}
 eval "$(/opt/homebrew/bin/brew shellenv)"
 {{- else -}}
-# zsh does not read /etc/profile.d, where Bazzite and friends put brew's
-# shellenv, so brew-installed binaries are otherwise invisible from zsh.
-[ -x /home/linuxbrew/.linuxbrew/bin/brew ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# Homebrew is set up in .zshrc on Linux, not here: herdr opens its panes as
+# non-login shells there, which never read this file.
 {{- end }}

@@ -12,6 +12,7 @@ quick-terminal-animation-duration = 0.05
 
 # Nerd Font for icon/powerline glyphs.
 font-family = "{{ .font.family }}"
+font-size = {{ index .font.size .chezmoi.os }}
 
 # Visuals. Built-in themes come from `ghostty +list-themes`; anything not
 # shipped with Ghostty is vendored under themes/ alongside this file.

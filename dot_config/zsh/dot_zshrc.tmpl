@@ -17,6 +17,12 @@ export EDITOR="nvim"
 # run — and anything spawning "the user's shell" (herdr's panes) then gets bash.
 [[ -n "${commands[zsh]}" ]] && export SHELL="${commands[zsh]}"
 
+{{ if ne .chezmoi.os "darwin" -}}
+# Not .zprofile: herdr opens its panes as non-login shells on Linux, so that
+# file never runs and brew-installed tools would be missing there.
+[ -x /home/linuxbrew/.linuxbrew/bin/brew ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+{{ end -}}
 # Mise must come first: on Linux every tool below comes from mise and nothing
 # resolves on PATH until this runs. https://mise.jdx.dev/
 command -v mise >/dev/null && eval "$(mise activate zsh)"

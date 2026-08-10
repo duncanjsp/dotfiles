@@ -6,6 +6,12 @@ font:
   # Font family passed to the tools. Remember NerdFont
   # varient for pretty glyphs!
   family: Maple Mono NF
+  # Ghostty measures point sizes against real display DPI on Linux but a 72dpi
+  # logical baseline on macOS, so the same number renders larger on Linux.
+  # 13 is Ghostty's own default, kept so the Macs are unchanged.
+  size:
+    darwin: 13
+    linux: 11
   # Linux has no casks, so it fetches the same asset the cask uses.
   repo: subframe7536/maple-font
   version: v7.9
