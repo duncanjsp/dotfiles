@@ -1,6 +1,5 @@
 {{ if eq .chezmoi.os "darwin" -}}
 eval "$(/opt/homebrew/bin/brew shellenv)"
 {{- else -}}
-# Homebrew is set up in .zshrc on Linux, not here: herdr opens its panes as
-# non-login shells there, which never read this file.
+# Homebrew is loaded in .zshrc on Linux; herdr's panes never read this file.
 {{- end }}

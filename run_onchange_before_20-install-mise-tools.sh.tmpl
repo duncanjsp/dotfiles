@@ -1,7 +1,6 @@
 {{- if eq .chezmoi.os "linux" -}}
 #!/bin/bash
-# Tools come from mise rather than Homebrew: user-local, no sudo, and the same
-# on Debian-based and immutable distros. See .chezmoidata/packages.yaml.
+# mise rather than Homebrew: user-local, and the same on any distro.
 set -eo pipefail
 
 {{ template "lib/output.sh" . }}

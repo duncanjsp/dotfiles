@@ -1,8 +1,5 @@
-# Output helpers for the run_ scripts.
-#
-# gum is installed by these scripts, so the first run on a new machine happens
-# before it exists; chezmoi apply over SSH also has no TTY for it to draw on.
-# Both fall back to printf.
+# Output helpers for the run_ scripts. gum is installed *by* them and needs a
+# TTY, so neither is guaranteed; both fall back to printf.
 if command -v gum >/dev/null 2>&1 && [ -t 1 ]; then
 	_have_gum=1
 else

@@ -1,16 +1,12 @@
 {{- if eq .chezmoi.os "linux" -}}
 #!/bin/bash
 # Installs make, a C compiler and zsh, then makes zsh the login shell.
-# nvim-treesitter builds parsers with cc and telescope-fzf-native compiles C.
-#
-# Uses sudo -n throughout so it can never wait for a password and hang an apply
-# over SSH; where it cannot act it prints the command and continues.
+# sudo -n throughout, so it can never block on a password and hang an apply.
 set -o pipefail
 
 {{ template "lib/output.sh" . }}
 
-# zsh does not read /etc/profile.d, so a brew installed by an earlier run is not
-# on PATH when chezmoi is invoked from zsh, and its packages look missing.
+# zsh skips /etc/profile.d, so an existing brew looks absent without this.
 if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
 	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
@@ -27,8 +23,7 @@ command -v zsh >/dev/null 2>&1 || need_zsh=1
 if [ $((need_make + need_cc + need_zsh)) -gt 0 ]; then
 	header "Build prerequisites"
 
-	# Not build-essential or @development-tools: both add g++ and packaging
-	# tooling that nothing here uses.
+	# Not build-essential or @development-tools: both pull in far more.
 	apt_pkgs=()
 	dnf_pkgs=()
 	brew_pkgs=()
@@ -53,8 +48,7 @@ if [ $((need_make + need_cc + need_zsh)) -gt 0 ]; then
 		brew install "${brew_pkgs[@]}" ||
 			warn "install failed; run: brew install ${brew_pkgs[*]}"
 	elif command -v rpm-ostree >/dev/null 2>&1; then
-		# Never layer automatically: rpm-ostree builds a new deployment and the
-		# packages only appear after a reboot.
+		# Never layer automatically: rpm-ostree needs a reboot to take effect.
 		warn "missing ${dnf_pkgs[*]} on an immutable system. Either:"
 		warn "  brew install ${brew_pkgs[*]}      (no reboot, recommended)"
 		warn "  sudo rpm-ostree install ${dnf_pkgs[*]}   (needs a reboot)"

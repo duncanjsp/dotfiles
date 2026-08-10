@@ -13,23 +13,19 @@ export PATH="$HOME/.local/bin:$PATH"
 # over EDITOR, which would open Zed from the terminal. Use `zed {file}` directly.
 export EDITOR="nvim"
 
-# $SHELL comes from /etc/passwd, so it still says bash where chsh could not
-# run — and anything spawning "the user's shell" (herdr's panes) then gets bash.
+# $SHELL comes from /etc/passwd, so it lies wherever chsh never ran.
 [[ -n "${commands[zsh]}" ]] && export SHELL="${commands[zsh]}"
 
 {{ if ne .chezmoi.os "darwin" -}}
-# Not .zprofile: herdr opens its panes as non-login shells on Linux, so that
-# file never runs and brew-installed tools would be missing there.
+# Not .zprofile: herdr's panes are non-login on Linux and never read it.
 [ -x /home/linuxbrew/.linuxbrew/bin/brew ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 {{ end -}}
-# Mise must come first: on Linux every tool below comes from mise and nothing
-# resolves on PATH until this runs. https://mise.jdx.dev/
+# Must come first: on Linux everything below comes from mise.
 command -v mise >/dev/null && eval "$(mise activate zsh)"
 {{ if .gui }}
-# Must follow mise activation: on Linux herdr comes from mise. The guard
-# matters too — a bare `exec` of a missing command exits zsh outright rather
-# than falling through to `|| exit`, closing the terminal.
+# After mise, which provides herdr on Linux. Unguarded, a failed exec of a
+# missing command exits zsh outright rather than reaching `|| exit`.
 if [[ -z "$HERDR_ENV" && -z "$SSH_CONNECTION" && "$GHOSTTY_QUICK_TERMINAL" != "1" ]] && command -v herdr >/dev/null; then
 	exec herdr || exit
 fi

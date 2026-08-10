@@ -26,12 +26,8 @@ packages:
     - umputun/apps/revdiff
   casks:
     - 1password-cli
-  # Linux uses mise: user-local, no sudo, and the same on Debian-based and
-  # immutable distros alike.
-  #
-  # Omits git (from the distro) and mise (installs itself). neovim@latest
-  # resolves to nightly, hence @stable. eza and revdiff are not in mise's
-  # registry but publish Linux binaries, so they come from releases via ubi.
+  # Omits git (from the distro) and mise (installs itself). neovim@latest is
+  # nightly, hence @stable. eza and revdiff come from releases via ubi.
   mise:
     core:
       - atuin@latest
