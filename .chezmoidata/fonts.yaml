@@ -10,7 +10,7 @@ font:
   # number looks bigger there. 13 is Ghostty's default.
   size:
     darwin: 13
-    linux: 11
+    linux: 10
   # Linux has no casks, so it fetches the same asset the cask uses.
   repo: subframe7536/maple-font
   version: v7.9
