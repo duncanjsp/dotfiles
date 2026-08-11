@@ -26,7 +26,9 @@ command -v mise >/dev/null && eval "$(mise activate zsh)"
 {{ if .gui }}
 # After mise, which provides herdr on Linux. Unguarded, a failed exec of a
 # missing command exits zsh outright rather than reaching `|| exit`.
-if [[ -z "$HERDR_ENV" && -z "$SSH_CONNECTION" && "$GHOSTTY_QUICK_TERMINAL" != "1" ]] && command -v herdr >/dev/null; then
+# Auto-launch herdr only when stdin is a TTY, not already inside herdr, not
+# over SSH, and not in Ghostty's quick terminal.
+if [[ -t 0 && -z "$HERDR_ENV" && -z "$SSH_CONNECTION" && "$GHOSTTY_QUICK_TERMINAL" != "1" ]] && command -v herdr >/dev/null; then
 	exec herdr || exit
 fi
 {{ end }}
