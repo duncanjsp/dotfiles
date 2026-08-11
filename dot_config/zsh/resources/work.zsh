@@ -22,3 +22,4 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 
 # Aliases
 alias cdb5="cd $GOPATH/src/go.1password.io/b5"
+alias assume=". assume"
