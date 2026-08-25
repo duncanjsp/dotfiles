@@ -5,12 +5,8 @@ eval "$(direnv hook zsh)"
 export DIRENV_WARN_TIMEOUT=0
 
 # Auth for Packages
-export GITHUB_TOKEN="op://Employee/GitHub Token EMU/password"
 export CLOUDSMITH_API_KEY="op://Employee/Cloudsmith API Key/credential"
 alias yarn="op run --account agilebits --no-masking -- yarn"
-
-# Let gh use its own keyring auth instead of the op-reference GITHUB_TOKEN/GH_TOKEN.
-gh() { GH_TOKEN= GITHUB_TOKEN= command gh "$@"; }
 
 # Go Config for server
 export GOPATH=$HOME/go
