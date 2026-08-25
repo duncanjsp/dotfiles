@@ -25,6 +25,10 @@ opt.splitbelow = true
 opt.updatetime = 250
 opt.showmode = false
 
+-- blink.cmp draws the LSP menu; this governs the built-in completions that
+-- remain, such as <C-x><C-f> and the command line.
+opt.completeopt = { "menu", "menuone", "noselect", "popup", "fuzzy" }
+
 -- Fold via Treesitter, open by default.
 opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"

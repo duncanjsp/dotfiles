@@ -27,6 +27,8 @@ return {
       yaml = { "prettier" },
       lua = { "stylua" },
       go = { "gofmt" },
+      sh = { "shfmt" },
+      bash = { "shfmt" },
       ["_"] = { "trim_whitespace" },
     },
     format_on_save = {

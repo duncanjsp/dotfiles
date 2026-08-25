@@ -47,6 +47,26 @@ other formulae, but both are used directly. Leaning on a transitive dependency
 is exactly how `ripgrep` — which Telescope's live grep needs — stayed
 undeclared until a server, with no Mac drift to hide behind, exposed it.
 
+### Editor tooling
+
+Language servers are the one class of tool `packages.yaml` deliberately does
+not own. They are declared in `dot_config/nvim/lua/plugins/lsp.lua` and
+installed by Mason, because they are useful only inside the editor and their
+names differ per backend — the list would fragment across Homebrew and mise for
+no gain. Mason's `PATH = "append"` means a server that *is* declared in
+`packages.yaml` still wins, so promoting one later costs nothing.
+
+A server is enabled by the existence of `dot_config/nvim/after/lsp/<name>.lua`.
+Neovim finds `lsp/<name>.lua` anywhere on the runtimepath and merges them, so
+those files hold only the overrides; the base config comes from
+nvim-lspconfig. Nothing keeps an enable list in sync — the file is the switch.
+
+Everything installs itself on first launch. `run_onchange_after_30` only
+front-loads it so a freshly applied machine is ready before nvim is first
+opened, and re-runs when the server or parser list changes. It skips quietly
+when `node` or `tree-sitter` are missing rather than failing a package at a
+time.
+
 ### Typeface
 
 The font lives in one place, `.chezmoidata/fonts.yaml`: `cask` is what the

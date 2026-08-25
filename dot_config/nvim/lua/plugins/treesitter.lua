@@ -10,18 +10,7 @@ return {
   config = function()
     local ts = require("nvim-treesitter")
 
-    ts.install({
-      "lua",
-      "vim",
-      "vimdoc",
-      "query",
-      "bash",
-      "json",
-      "yaml",
-      "toml",
-      "markdown",
-      "markdown_inline",
-    })
+    ts.install(require("config.parsers"))
 
     -- On `main`, highlighting is started manually per buffer.
     vim.api.nvim_create_autocmd("FileType", {

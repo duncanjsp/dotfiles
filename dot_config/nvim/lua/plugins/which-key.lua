@@ -21,6 +21,10 @@ return {
     -- Group labels + docs for built-ins so they show in the cheat sheet.
     wk.add({
       { "<leader>f", group = "find" },
+      -- The LSP members of this group are added per-buffer on attach.
+      { "<leader>c", group = "code" },
+      { "]d", desc = "Next diagnostic" },
+      { "[d", desc = "Previous diagnostic" },
       { "<C-w>o", desc = "Close other windows" },
       { "<C-w>=", desc = "Equalize split sizes" },
       { "<C-w>v", desc = "Split window vertically" },

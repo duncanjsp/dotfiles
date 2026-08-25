@@ -1,0 +1,49 @@
+{{- if lookPath "nvim" -}}
+#!/bin/bash
+# Plugins, LSP servers and parsers all install themselves on first launch; this
+# only front-loads that, so a freshly applied machine is ready before nvim is
+# opened. Re-runs when either list below changes.
+#
+#   lsp.lua     {{ include "dot_config/nvim/lua/plugins/lsp.lua" | sha256sum }}
+#   parsers.lua {{ include "dot_config/nvim/lua/config/parsers.lua" | sha256sum }}
+#   blink.lua   {{ include "dot_config/nvim/lua/plugins/blink.lua" | sha256sum }}
+set -eo pipefail
+
+{{ template "lib/output.sh" . }}
+
+header "Neovim tooling"
+
+# Most servers are npm packages and every parser is compiled by the tree-sitter
+# CLI. Without those, Mason fails one package at a time and the errors scroll
+# past; better to say so once and let nvim retry on its next launch.
+for tool in node tree-sitter; do
+	if ! command -v "$tool" >/dev/null 2>&1; then
+		warn "$tool not on PATH; skipping (nvim will install on next launch)"
+		exit 0
+	fi
+done
+
+say "syncing plugins"
+nvim --headless "+Lazy! sync" +qa
+
+# The Sync variant blocks; the plain one returns immediately and headless would
+# exit before anything finished downloading.
+say "installing LSP servers and tools"
+nvim --headless "+MasonToolsInstallSync" +qa
+
+# nvim-treesitter's `main` branch has no TSUpdateSync, but install() returns a
+# task. Ten minutes is for a cold machine compiling every parser at once.
+# blink.cmp fetches its Rust matcher when it first loads, which is InsertEnter.
+# Doing it here means a fresh machine never falls back to the slower Lua matcher
+# mid-keystroke.
+say "fetching completion matcher"
+nvim --headless \
+	-c 'lua require("blink.cmp")' \
+	-c 'lua vim.wait(120000, function() return vim.uv.fs_stat(vim.fn.stdpath("data") .. "/lazy/blink.cmp/target/release/version") ~= nil end, 500)' \
+	-c 'qa'
+
+say "building Treesitter parsers"
+nvim --headless \
+	-c 'lua require("nvim-treesitter.install").install(require("config.parsers")):wait(600000)' \
+	-c 'qa'
+{{ end -}}
