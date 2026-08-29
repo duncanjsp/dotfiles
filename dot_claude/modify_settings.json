@@ -1,0 +1,22 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /* Merges shared settings into ~/.claude/settings.json, leaving machine-specific keys alone. */ -}}
+{{- $settings := dict -}}
+{{- if trim .chezmoi.stdin -}}
+{{-   $settings = fromJson .chezmoi.stdin -}}
+{{- end -}}
+
+{{- $settings = setValueAtPath "model" "opus" $settings -}}
+{{- $settings = setValueAtPath "effortLevel" "high" $settings -}}
+{{- $settings = setValueAtPath "theme" "dark" $settings -}}
+{{- $settings = setValueAtPath "statusLine" (dict
+      "type" "command"
+      "command" (joinPath .chezmoi.homeDir ".claude/statusline.sh")
+      "padding" 0
+      "refreshInterval" 30) $settings -}}
+{{- $settings = setValueAtPath (list "enabledPlugins" "revdiff@revdiff") true $settings -}}
+{{- $settings = setValueAtPath (list "enabledPlugins" "frontend-design@claude-plugins-official") true $settings -}}
+{{- $settings = setValueAtPath (list "enabledPlugins" "mattpocock-skills@claude-plugins-official") true $settings -}}
+{{- $settings = setValueAtPath (list "extraKnownMarketplaces" "revdiff") (dict
+      "source" (dict "source" "github" "repo" "umputun/revdiff")) $settings -}}
+
+{{- toPrettyJson $settings -}}

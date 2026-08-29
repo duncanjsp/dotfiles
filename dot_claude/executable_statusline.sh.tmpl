@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+# Claude Code status line: working directory and revision, then session state.
+#
+# Claude Code pipes the session JSON in on stdin and renders whatever comes
+# back on stdout. Absent fields drop their segment rather than rendering a
+# zero, which is what lets one script serve both machines unchanged.
+#
+# Colours come from .chezmoidata/theme.yaml, the palette oh-my-posh reads.
+# Touch ~/.claude/.statusline-debug to dump payloads per session.
+
+set -uo pipefail
+
+# read returns nonzero at EOF having still filled the variable, hence || true.
+IFS= read -r -d '' payload || true
+
+if [[ -f "$HOME/.claude/.statusline-debug" ]]; then
+  [[ $payload =~ \"session_id\"[[:space:]]*:[[:space:]]*\"([^\"]*)\" ]] &&
+    printf '%s' "$payload" >"$HOME/.claude/.statusline-payload-${BASH_REMATCH[1]}.json"
+fi
+
+{{ $palette := (index .themes .theme).palette -}}
+ansi() {
+  local h=${1#\#}
+  printf '\033[38;2;%d;%d;%dm' "$((16#${h:0:2}))" "$((16#${h:2:2}))" "$((16#${h:4:2}))"
+}
+
+c_plain=$(ansi '{{ $palette.fg_plain }}')
+c_accent=$(ansi '{{ $palette.accent }}')
+c_path=$(ansi '{{ $palette.path }}')
+c_ok=$(ansi '{{ $palette.ok }}')
+c_warn=$(ansi '{{ $palette.warn }}')
+c_error=$(ansi '{{ $palette.error }}')
+c_info=$(ansi '{{ $palette.info }}')
+c_remote=$(ansi '{{ $palette.remote }}')
+c_dim=$'\033[2m'
+c_bold=$'\033[1m'
+c_reset=$'\033[0m'
+
+# A second jq invocation to read one field would cost more than the whole
+# render. Whitespace is tolerated so a pretty-printed payload still matches.
+[[ $payload =~ \"current_dir\"[[:space:]]*:[[:space:]]*\"([^\"]*)\" ]] &&
+  probe=${BASH_REMATCH[1]} || probe=""
+
+# jj before git, deliberately: colocation parks .git/HEAD on a bare commit, so
+# reading it reports a SHA where the bookmark is the useful name. Same
+# precedence the prompt uses via oh-my-posh's disable_with_jj.
+vcs_kind="" vcs_name="" vcs_rev_pre="" vcs_rev_suf="" vcs_ahead=0
+while [[ -n $probe && $probe != / ]]; do
+  if [[ -d $probe/.jj ]]; then
+    # --ignore-working-copy stops jj snapshotting on every render, which is
+    # both a write and far slower. heads() rather than latest() so equidistant
+    # bookmarks all show instead of one being picked silently.
+    #
+    # One row for the bookmark and one per revision above it. Anything
+    # strictly between the closest bookmark and @ carries no bookmark of its
+    # own -- if it did, it would be the closer one -- so an empty first field
+    # marks a revision that is ahead.
+    bm='heads(::@ & bookmarks())'
+    # Split by hand rather than with IFS=$'\t': tab is an IFS whitespace
+    # character, so read would collapse the leading empty field and shift the
+    # change id into the bookmark slot.
+    while IFS= read -r line; do
+      name=${line%%$'\t'*}
+      tail=${line#*$'\t'}
+      pre=${tail%%$'\t'*}
+      tail=${tail#*$'\t'}
+      suf=${tail%%$'\t'*}
+      wc=${tail#*$'\t'}
+      [[ $wc == "@" ]] && vcs_rev_pre=$pre vcs_rev_suf=$suf
+      if [[ -n $name ]]; then
+        vcs_name=${name%% *}
+      else
+        vcs_ahead=$((vcs_ahead + 1))
+      fi
+    done < <(jj -R "$probe" log --no-graph --ignore-working-copy \
+      -r "$bm | ($bm..@)" \
+      -T 'bookmarks ++ "\t" ++ change_id.shortest(8).prefix() ++ "\t"
+          ++ change_id.shortest(8).rest() ++ "\t"
+          ++ if(current_working_copy, "@", "") ++ "\n"' 2>/dev/null)
+    [[ -n $vcs_name || -n $vcs_rev_pre ]] && vcs_kind=jj
+    break
+  elif [[ -f $probe/.git/HEAD ]]; then
+    read -r head <"$probe/.git/HEAD" 2>/dev/null || head=""
+    # A detached HEAD names nothing useful, so it shows nothing.
+    [[ $head == ref:* ]] && vcs_name=${head##*/} vcs_kind=git
+    break
+  elif [[ -f $probe/.git ]]; then
+    break # worktree or submodule; the payload covers these
+  fi
+  probe=${probe%/*}
+done
+
+printf '%s' "$payload" | jq -r \
+  --arg plain "$c_plain" --arg accent "$c_accent" --arg path "$c_path" \
+  --arg ok "$c_ok" --arg warn "$c_warn" --arg error "$c_error" \
+  --arg info "$c_info" --arg remote "$c_remote" --arg dim "$c_dim" \
+  --arg bold "$c_bold" --arg reset "$c_reset" \
+  --arg vcs_name "$vcs_name" --arg vcs_kind "$vcs_kind" \
+  --arg vcs_rev_pre "$vcs_rev_pre" --arg vcs_rev_suf "$vcs_rev_suf" \
+  --arg vcs_ahead "$vcs_ahead" --arg home "$HOME" '
+
+# Nerd Font icons sit in the Private Use Area, which not every editor and
+# pipeline preserves. The \u escapes keep this file pure ASCII.
+def g_dir:      "\uf07b";  # nf-fa-folder
+def g_bookmark: "\uf02e";  # nf-fa-bookmark
+def g_branch:   "\ue725";  # nf-dev-git_branch
+def g_fast:     "\uf0e7";  # nf-fa-bolt
+def g_up:       "\u2191";
+def g_model:    "\u25c6";
+def g_agent:    "\u25c7";
+def g_worktree: "\u2442";
+def g_on:       "\u25b0";
+def g_off:      "\u25b1";
+def g_ellip:    "\u2026";
+def g_sep:      "\u00b7";
+
+def rep($s; $n): if $n > 0 then $s * $n else "" end;
+
+# A nonzero percentage always shows at least one cell and only 100% fills the
+# bar; rounding alone would hide low usage and show a full bar at 95%.
+def bar($pct; $w):
+  (if $pct < 0 then 0 elif $pct > 100 then 100 else $pct end) as $p
+  | (if $p <= 0 then 0
+     elif $p >= 100 then $w
+     else ([1, (($p * $w / 100) | floor)] | max) end) as $f
+  | rep(g_on; $f) + rep(g_off; $w - $f);
+
+def heat($pct): if $pct >= 85 then $error elif $pct >= 60 then $warn else $ok end;
+
+def usd:
+  (. * 100 | round) as $c
+  | (($c / 100) | floor | tostring) + "."
+    + (($c % 100) | tostring | if length == 1 then "0" + . else . end);
+
+# Time left in a rate-limit window, shown only once the window is worth
+# worrying about. Coarse on purpose: minutes matter near a 5h reset, hours
+# near a 7d one, and neither wants seconds.
+def until($ts):
+  (($ts - now) | floor) as $s
+  | if $s <= 0 then "now"
+    elif $s < 3600 then (($s / 60) | floor | tostring) + "m"
+    elif $s < 86400 then (($s / 3600) | floor | tostring) + "h"
+                          + ((($s % 3600) / 60) | floor | tostring) + "m"
+    else (($s / 86400) | floor | tostring) + "d"
+         + ((($s % 86400) / 3600) | floor | tostring) + "h" end;
+
+def resets($w; $p):
+  if $p >= 80 and ($w.resets_at // null) != null
+  then $dim + $plain + " " + until($w.resets_at) + $reset
+  else "" end;
+
+def sep: $dim + $plain + "  " + g_sep + "  " + $reset;
+def gap: $dim + $plain + "   " + $reset;
+
+# Long paths lose their middle, not their head: "~" plus the last two
+# components locates you better than three taken off the tail.
+def cwd:
+  (.workspace.current_dir // "")
+  | if startswith($home) then "~" + .[($home | length):] else . end
+  | (split("/")) as $p
+  | if (length <= 56) or (($p | length) <= 3) then .
+    else $p[0] + "/" + g_ellip + "/" + ($p[-2:] | join("/")) end;
+
+[
+
+# ---- row one: where the session is -------------------------------------
+
+([
+  (if cwd != "" then $path + g_dir + " " + cwd + $reset else empty end),
+
+  (if (.worktree.branch // "") != "" then
+     $ok + g_branch + " " + .worktree.branch + $reset
+   elif $vcs_kind == "jj" then
+     (if $vcs_name != "" then $ok + g_bookmark + " " + $vcs_name + $reset else "" end)
+     + (if $vcs_ahead != "0" then $warn + " " + g_up + $vcs_ahead + $reset else "" end)
+     + (if $vcs_rev_pre != "" then
+          " " + $accent + $bold + $vcs_rev_pre + $reset
+          + $dim + $plain + $vcs_rev_suf + $reset
+        else "" end)
+   elif $vcs_kind == "git" then $ok + g_branch + " " + $vcs_name + $reset
+   else empty end),
+
+  (if .worktree.name then $accent + g_worktree + " " + .worktree.name + $reset
+   else empty end),
+
+  (if .agent.name then $remote + g_agent + " " + .agent.name + $reset else empty end),
+
+  (if .remote then $remote + g_agent + " remote" + $reset else empty end)
+]
+| join(gap)),
+
+# ---- row two: what the session is doing --------------------------------
+
+([
+  ($accent + g_model + " " + $bold + (.model.display_name // "?") + $reset
+   + (if .effort.level then " " + $warn + .effort.level + $reset else "" end)
+   + (if .fast_mode then " " + $warn + g_fast + $reset else "" end)),
+
+  (if .permission_mode and .permission_mode != "default" and .permission_mode != "auto" then
+     $warn + .permission_mode + $reset
+   else empty end),
+
+  (if .context_window.used_percentage != null then
+     (.context_window.used_percentage) as $p
+     | $dim + $plain + "ctx " + $reset + heat($p) + bar($p; 10)
+       + " " + ($p | floor | tostring) + "%" + $reset
+   else empty end),
+
+  (if .rate_limits.five_hour then
+     (.rate_limits.five_hour.used_percentage) as $p
+     | $dim + $plain + "5h " + $reset + heat($p) + bar($p; 5)
+       + " " + ($p | floor | tostring) + "%" + $reset
+       + resets(.rate_limits.five_hour; $p)
+   else empty end),
+
+  (if .rate_limits.seven_day then
+     (.rate_limits.seven_day.used_percentage) as $p
+     | $dim + $plain + "7d " + $reset + heat($p) + bar($p; 5)
+       + " " + ($p | floor | tostring) + "%" + $reset
+       + resets(.rate_limits.seven_day; $p)
+   else empty end),
+
+  (if .rate_limits.spend_limit then
+     (.rate_limits.spend_limit.used_percentage) as $p
+     | $dim + $plain + "budget " + $reset + heat($p)
+       + ($p | floor | tostring) + "%" + $reset
+       + resets(.rate_limits.spend_limit; $p)
+   else empty end),
+
+  (if .cost.total_cost_usd then
+     $info + "$" + (.cost.total_cost_usd | usd) + $reset
+   else empty end)
+]
+| join(sep))
+]
+| map(select(length > 0)) | .[]
+' 2>/dev/null || printf '%s' "${c_error}statusline error${c_reset}"
