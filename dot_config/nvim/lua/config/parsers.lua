@@ -13,6 +13,7 @@ return {
   "markdown_inline",
   "go",
   "gomod",
+  "gotmpl",
   "javascript",
   "typescript",
   "tsx",

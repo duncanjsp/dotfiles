@@ -15,6 +15,7 @@ packages:
     - herdr
     - jandedobbeleer/oh-my-posh/oh-my-posh
     - jj
+    - jq
     - mise
     - neovim
     - node@20
@@ -41,6 +42,7 @@ packages:
       - go@latest
       - gum@latest
       - jj@latest
+      - jq@latest
       - neovim@stable
       - node@latest
       - npm:prettier@latest

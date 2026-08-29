@@ -31,10 +31,15 @@ return {
       bash = { "shfmt" },
       ["_"] = { "trim_whitespace" },
     },
-    format_on_save = {
-      timeout_ms = 500,
-      lsp_format = "fallback",
-    },
+    -- A chezmoi template is not valid in its target language, so shfmt and
+    -- friends either refuse it or mangle the `{{ }}`. See config/chezmoi.lua
+    -- for where that filetype suffix comes from.
+    format_on_save = function(bufnr)
+      if vim.bo[bufnr].filetype:find("chezmoitmpl", 1, true) then
+        return nil
+      end
+      return { timeout_ms = 500, lsp_format = "fallback" }
+    end,
     notify_no_formatters = false,
   },
 }

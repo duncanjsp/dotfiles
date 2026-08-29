@@ -77,7 +77,8 @@ those two values and `chezmoi apply` to switch typeface everywhere.
 
 `.chezmoidata/theme.yaml` holds a `theme` selector and a `themes` table. Point
 the selector at another key in the table, `chezmoi apply`, and Ghostty, bat,
-herdr, Zed, Neovim and the oh-my-posh palette all follow.
+herdr, Zed, Neovim, the oh-my-posh palette and the Claude Code status line all
+follow.
 
 Each theme entry carries whatever each tool needs, because none of them agree
 on naming: Ghostty and Zed want `Catppuccin Mocha`, herdr wants `catppuccin`,
@@ -95,6 +96,91 @@ terminal ANSI, so they follow Ghostty's palette for free.
 Themes that aren't built into a tool are vendored next to its config:
 `dot_config/ghostty/themes/dracula-pro` and `dot_config/zed/themes/`. Zed
 installs its theme extension itself via `auto_install_extensions`.
+
+### Claude Code status line
+
+`dot_claude/executable_statusline.sh.tmpl` renders two rows under the Claude
+Code prompt: the working directory and revision on top, then the session state
+— model and effort, context meter, rate-limit windows, session cost.
+
+Every value comes from the JSON payload Claude Code pipes to the script on
+stdin, bar one. Nothing is read back out of `~/.claude/projects/`, and no token
+is priced locally, so there is no cache to warm and no price table to go stale.
+Claude Code already computes the session cost itself; reconstructing it from
+transcript tokens undershot its own figure by 4–6%, because Haiku side-calls
+and web-search requests never reach the transcript.
+
+The exception is the revision, which no payload field carries, so the script
+walks up from the working directory looking for one. `.jj` is checked before
+`.git`, deliberately: in a colocated repo `.git/HEAD` sits on a bare commit
+permanently, so reading it reports a SHA where the bookmark is the useful
+thing. That is the same precedence the prompt uses via oh-my-posh's
+`disable_with_jj`. The revset is `heads(::@ & bookmarks())` — `heads` rather
+than `latest` so an ambiguous history reports every equidistant bookmark
+instead of silently choosing one.
+
+In a jj repo the row carries the closest bookmark, how many revisions sit above
+it, and the change id of `@`. One `jj log` covers all three: it lists the
+bookmark and every revision above it, and since anything strictly between the
+closest bookmark and `@` carries no bookmark of its own — if it did, it would
+be the closer one — an empty bookmark field marks a revision as ahead. The
+change id is split into `.prefix()` and `.rest()` so the unique part can be
+highlighted the way jj highlights it itself.
+
+`--ignore-working-copy` is load-bearing: without it `jj` snapshots the working
+copy on every render, which is a write, and on a large tree far slower (76ms
+against 26ms on a React Native repo, which also refuses to snapshot its 100MB+
+Pods artefacts). Nothing shown depends on a snapshot — the bookmark, the
+revisions above it and the change id are all properties of committed revisions
+— so there is no staleness to trade for that.
+
+Fields Claude Code omits simply drop out of the row rather than rendering as a
+zero — effort on a model with no effort setting, `five_hour`/`seven_day` on an
+account with no windows, `spend_limit` on anything but gateway auth, worktree
+fields outside a worktree. That is what lets one script serve both the personal
+subscription and the work enterprise seat without branching on `profile`: the
+payload decides what is relevant, not the template.
+
+A rate-limit window also shows how long it has left, but only past 80% — below
+that the percentage is the whole story and the time is noise. The countdown
+floors rather than rounds, so it understates by up to a minute, which is the
+right direction for time remaining.
+
+Colours follow the same role-keyed palette as the prompt. The status line draws
+on a transparent background throughout, so every role resolves to a light
+accent, per the invariant above. `theme.yaml` stores hex and terminals want
+24-bit ANSI, so the script converts with bash arithmetic — a builtin, costing
+no forks.
+
+It renders in ~25ms outside a repo and ~50ms in a jj one, where the single `jj
+log` call is most of the difference. Reading stdin and extracting the working
+directory are both done with bash builtins rather than `cat` and a second `jq`;
+those two forks alone were 16ms of a 41ms render. The field match tolerates
+whitespace around the JSON colon even though Claude Code emits compact JSON — a
+pretty-printed payload would otherwise lose the revision name silently, which
+is the sort of failure a status line never reports.
+
+Glyphs are written as jq `\uXXXX` escapes rather than literals. The Nerd Font
+icons live in the Private Use Area, which does not survive every editor and
+pipeline that touches this file; the escapes keep the source pure ASCII.
+Codepoints are verified present in Maple Mono NF.
+
+`jq` is declared in `packages.yaml` for this, even though macOS 27 now ships
+one at `/usr/bin/jq` — the same reasoning that applies to `ripgrep` above.
+
+Wiring lives in `~/.claude/settings.json`, which chezmoi deliberately does not
+own outright: NotchBar writes its own hooks into that file, Claude Code's
+`/config` rewrites it, and a work machine carries keys this one should never
+see, so a managed copy would fight all three. `dot_claude/modify_settings.json`
+is a modify template instead. It parses whatever is there, sets the shared keys
+— `statusLine` among them, with its path built from `.chezmoi.homeDir` — and
+leaves everything else alone. Removing a line from it stops managing that key
+rather than deleting it; use `unset` for that.
+
+Touch `~/.claude/.statusline-debug` to dump each payload to
+`~/.claude/.statusline-payload-<session>.json` for inspection. The filename
+carries the session id because every session on the machine honours the same
+marker, and a shared target gets torn between concurrent writers.
 
 ### Bootstrapping a Linux box
 
