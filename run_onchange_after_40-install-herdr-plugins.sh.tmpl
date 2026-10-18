@@ -1,0 +1,35 @@
+{{- if .gui -}}
+#!/bin/bash
+set -eo pipefail
+
+{{ template "lib/output.sh" . }}
+
+plugins=(
+	olivergilan/herdr-jj
+	duncanjsp/herdr-jj-sidebar
+)
+
+header "herdr plugins"
+
+if [ -d "$HOME/.local/share/mise/shims" ]; then
+	PATH="$HOME/.local/share/mise/shims:$PATH"
+fi
+
+for tool in herdr cargo; do
+	if ! command -v "$tool" >/dev/null 2>&1; then
+		warn "$tool not on PATH; skipping plugin install"
+		exit 0
+	fi
+done
+
+installed="$(herdr plugin list)"
+for plugin in "${plugins[@]}"; do
+	id="$(printf '%s' "${plugin/\//.}" | tr '[:upper:]' '[:lower:]')"
+	if grep -q -- "- $id " <<<"$installed"; then
+		say "$id already installed"
+		continue
+	fi
+	say "installing $id"
+	herdr plugin install --yes "$plugin"
+done
+{{ end -}}
