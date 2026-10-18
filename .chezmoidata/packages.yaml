@@ -21,6 +21,7 @@ packages:
     - node@20
     - prettier
     - ripgrep
+    - rust
     - stylua
     # Used directly by nvim-treesitter, not just as a neovim dependency.
     - tree-sitter
@@ -54,3 +55,4 @@ packages:
       - ubi:umputun/revdiff@latest
     gui:
       - herdr@latest
+      - rust@latest
