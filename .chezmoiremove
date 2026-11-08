@@ -1,5 +1,3 @@
-# Renamed to personal.zsh and work.zsh. chezmoi leaves unmanaged files in
-# place, and .zshrc sources every *.zsh in that directory.
-# Safe to delete this file once both Macs have applied.
+# Renamed to personal.zsh and work.zsh; .zshrc sources every *.zsh here.
 .config/zsh/resources/fantasmic.zsh
 .config/zsh/resources/test-track.zsh

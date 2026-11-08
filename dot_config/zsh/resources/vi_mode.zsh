@@ -1,11 +1,8 @@
-# vim mode config
-# Activate vim mode.
 bindkey -v
 
-# Remove mode switching delay.
 KEYTIMEOUT=5
 
-# Change cursor shape for different vi modes.
+# \e[1 q is a block cursor, \e[5 q a beam.
 function zle-keymap-select {
    if [[ ${KEYMAP} == vicmd ]] ||
       [[ $1 = 'block' ]]; then
@@ -20,10 +17,8 @@ function zle-keymap-select {
 }
 zle -N zle-keymap-select
 
-# Use beam shape cursor on startup.
 echo -ne '\e[5 q'
 
-# Use beam shape cursor for each new prompt.
 preexec() {
    echo -ne '\e[5 q'
 }

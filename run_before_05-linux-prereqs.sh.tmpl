@@ -1,7 +1,6 @@
 {{- if eq .chezmoi.os "linux" -}}
 #!/bin/bash
-# Installs make, a C compiler and zsh, then makes zsh the login shell.
-# sudo -n throughout, so it can never block on a password and hang an apply.
+# sudo -n throughout so a password prompt can never hang an apply.
 set -o pipefail
 
 {{ template "lib/output.sh" . }}
@@ -61,9 +60,8 @@ fi
 
 zsh_path="$(command -v zsh 2>/dev/null || true)"
 if [ -n "$zsh_path" ] && [ "${SHELL:-}" != "$zsh_path" ]; then
-	# chsh is not everywhere: Fedora ships it in util-linux-user and slim Debian
-	# images in passwd. usermod comes from shadow-utils and also skips the
-	# /etc/shells check that a Homebrew zsh would fail.
+	# chsh is often missing on slim images; usermod also skips the /etc/shells
+	# check that a Homebrew zsh would fail.
 	if command -v chsh >/dev/null 2>&1; then
 		set_shell="chsh -s $zsh_path $(id -un)"
 	elif command -v usermod >/dev/null 2>&1; then

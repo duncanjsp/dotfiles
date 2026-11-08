@@ -1,16 +1,11 @@
-# Aliases for eza
-# eza https://eza.rocks/
 alias ls="eza -a --icons"
 alias ll="eza -al --no-user --time-style long-iso --icons --git"
 alias lt="eza -aTL 3 --icons"
 
-# bar is a better cat with syntax highlighting
 alias cat="bat"
 
-# Handy git aliases
 alias gwip='git add -A; git rm $(git ls-files --deleted) 2> /dev/null; git commit --no-verify --no-gpg-sign --message "--wip-- [skip ci]"'
 alias gunwip='git rev-list --max-count=1 --format="%s" HEAD | grep -q "\--wip--" && git reset HEAD~1'
-# Route `chezmoi diff` through revdiff; everything else passes through.
 chezmoi() {
   if [[ "$1" == "diff" ]] && command -v revdiff >/dev/null; then
     command chezmoi diff "${@:2}" | revdiff --stdin
@@ -19,6 +14,5 @@ chezmoi() {
   fi
 }
 {{ if .gui }}
-# Claude Sandbox
 alias cs="cd ~/Developer/ai-sandbox && claude"
 {{- end }}

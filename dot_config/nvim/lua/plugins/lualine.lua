@@ -1,13 +1,9 @@
--- https://github.com/nvim-lualine/lualine.nvim
 return {
   "nvim-lualine/lualine.nvim",
   dependencies = { "nvim-tree/nvim-web-devicons" },
   event = "VeryLazy",
   config = function()
-    -- jj status: nearest bookmark + revisions ahead + short change-id + edit
-    -- stats; falls back to the git branch outside jj repos. Cached, refreshed
-    -- on a few events rather than every redraw. Icons via nr2char to keep the
-    -- source ASCII-clean.
+    -- nr2char keeps Nerd Font glyphs out of the source.
     local SC_ICON = vim.fn.nr2char(0xe0a0)
     local AHEAD_ICON = vim.fn.nr2char(0x21e1)
     local EDIT_ICON = vim.fn.nr2char(0xf040)

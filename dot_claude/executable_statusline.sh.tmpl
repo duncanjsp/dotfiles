@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-# Claude Code status line: working directory and revision, then session state.
-#
-# Claude Code pipes the session JSON in on stdin and renders whatever comes
-# back on stdout. Absent fields drop their segment rather than rendering a
-# zero, which is what lets one script serve both machines unchanged.
-#
-# Colours come from the palette in .chezmoidata/theme.yaml.
 # Touch ~/.claude/.statusline-debug to dump payloads per session.
 
 set -uo pipefail
@@ -36,29 +29,20 @@ c_dim=$'\033[2m'
 c_bold=$'\033[1m'
 c_reset=$'\033[0m'
 
-# A second jq invocation to read one field would cost more than the whole
-# render. Whitespace is tolerated so a pretty-printed payload still matches.
+# Regex rather than jq: a second jq call costs more than the whole render.
 [[ $payload =~ \"current_dir\"[[:space:]]*:[[:space:]]*\"([^\"]*)\" ]] &&
   probe=${BASH_REMATCH[1]} || probe=""
 
-# jj before git, deliberately: colocation parks .git/HEAD on a bare commit, so
-# reading it reports a SHA where the bookmark is the useful name. Same
-# precedence the prompt uses via Starship's vcs.order.
+# jj before git: in a colocated repo .git/HEAD is always detached.
 vcs_kind="" vcs_name="" vcs_rev_pre="" vcs_rev_suf="" vcs_ahead=0
 while [[ -n $probe && $probe != / ]]; do
   if [[ -d $probe/.jj ]]; then
-    # --ignore-working-copy stops jj snapshotting on every render, which is
-    # both a write and far slower. heads() rather than latest() so equidistant
-    # bookmarks all show instead of one being picked silently.
-    #
-    # One row for the bookmark and one per revision above it. Anything
-    # strictly between the closest bookmark and @ carries no bookmark of its
-    # own -- if it did, it would be the closer one -- so an empty first field
-    # marks a revision that is ahead.
+    # --ignore-working-copy stops jj snapshotting (a slow write) on every
+    # render. Rows between the bookmark and @ have no bookmark of their own, so
+    # an empty first field counts one revision ahead.
     bm='heads(::@ & bookmarks())'
-    # Split by hand rather than with IFS=$'\t': tab is an IFS whitespace
-    # character, so read would collapse the leading empty field and shift the
-    # change id into the bookmark slot.
+    # Not IFS=$'\t': tab is IFS whitespace, so read would drop the empty
+    # leading field.
     while IFS= read -r line; do
       name=${line%%$'\t'*}
       tail=${line#*$'\t'}
@@ -81,7 +65,6 @@ while [[ -n $probe && $probe != / ]]; do
     break
   elif [[ -f $probe/.git/HEAD ]]; then
     read -r head <"$probe/.git/HEAD" 2>/dev/null || head=""
-    # A detached HEAD names nothing useful, so it shows nothing.
     [[ $head == ref:* ]] && vcs_name=${head##*/} vcs_kind=git
     break
   elif [[ -f $probe/.git ]]; then
@@ -99,8 +82,8 @@ printf '%s' "$payload" | jq -r \
   --arg vcs_rev_pre "$vcs_rev_pre" --arg vcs_rev_suf "$vcs_rev_suf" \
   --arg vcs_ahead "$vcs_ahead" --arg home "$HOME" '
 
-# Nerd Font icons sit in the Private Use Area, which not every editor and
-# pipeline preserves. The \u escapes keep this file pure ASCII.
+# Escapes because Nerd Font glyphs are Private Use Area characters that some
+# tools mangle.
 def g_dir:      "\uf07b";  # nf-fa-folder
 def g_bookmark: "\uf02e";  # nf-fa-bookmark
 def g_branch:   "\ue725";  # nf-dev-git_branch
@@ -116,8 +99,7 @@ def g_sep:      "\u00b7";
 
 def rep($s; $n): if $n > 0 then $s * $n else "" end;
 
-# A nonzero percentage always shows at least one cell and only 100% fills the
-# bar; rounding alone would hide low usage and show a full bar at 95%.
+# Not plain rounding: any usage shows a cell, and only 100% fills the bar.
 def bar($pct; $w):
   (if $pct < 0 then 0 elif $pct > 100 then 100 else $pct end) as $p
   | (if $p <= 0 then 0
@@ -132,9 +114,6 @@ def usd:
   | (($c / 100) | floor | tostring) + "."
     + (($c % 100) | tostring | if length == 1 then "0" + . else . end);
 
-# Time left in a rate-limit window, shown only once the window is worth
-# worrying about. Coarse on purpose: minutes matter near a 5h reset, hours
-# near a 7d one, and neither wants seconds.
 def until($ts):
   (($ts - now) | floor) as $s
   | if $s <= 0 then "now"
@@ -152,8 +131,6 @@ def resets($w; $p):
 def sep: $dim + $plain + "  " + g_sep + "  " + $reset;
 def gap: $dim + $plain + "   " + $reset;
 
-# Long paths lose their middle, not their head: "~" plus the last two
-# components locates you better than three taken off the tail.
 def cwd:
   (.workspace.current_dir // "")
   | if startswith($home) then "~" + .[($home | length):] else . end
@@ -162,8 +139,6 @@ def cwd:
     else $p[0] + "/" + g_ellip + "/" + ($p[-2:] | join("/")) end;
 
 [
-
-# ---- row one: where the session is -------------------------------------
 
 ([
   (if cwd != "" then $path + g_dir + " " + cwd + $reset else empty end),
@@ -188,8 +163,6 @@ def cwd:
   (if .remote then $remote + g_agent + " remote" + $reset else empty end)
 ]
 | join(gap)),
-
-# ---- row two: what the session is doing --------------------------------
 
 ([
   ($accent + g_model + " " + $bold + (.model.display_name // "?") + $reset

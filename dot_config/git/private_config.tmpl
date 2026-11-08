@@ -23,10 +23,8 @@
 	co = checkout
 	getremote = !git fetch && git reset --hard @{u}
 {{ if and .gui (eq .chezmoi.os "darwin") -}}
-{{- /* Elsewhere the default (ssh-keygen) is used instead, because it signs via
-       whatever $SSH_AUTH_SOCK points at — a local 1Password agent, or a
-       forwarded one over ssh. op-ssh-sign only ever reaches an app on the same
-       machine, so it cannot sign over ssh at all. */}}
+{{- /* Elsewhere ssh-keygen signs via $SSH_AUTH_SOCK, which can be forwarded;
+       op-ssh-sign can't sign over ssh. */}}
 [gpg "ssh"]
 	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
 {{ end -}}

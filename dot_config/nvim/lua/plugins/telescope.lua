@@ -1,6 +1,4 @@
--- https://github.com/nvim-telescope/telescope.nvim
--- `master` branch: the tagged 0.1.x release calls a Treesitter API that
--- Neovim 0.12 removed, crashing the preview.
+-- `master`: 0.1.x calls a Treesitter API removed in Neovim 0.12.
 return {
   "nvim-telescope/telescope.nvim",
   dependencies = {

@@ -1,4 +1,4 @@
--- Formatting is prettier's job (see conform.lua).
+-- conform formats with prettier.
 local inlay_hints = {
   enumMemberValues = { enabled = true },
   functionLikeReturnTypes = { enabled = true },

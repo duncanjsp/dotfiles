@@ -28,8 +28,7 @@ packages:
     - umputun/apps/revdiff
   casks:
     - 1password-cli
-  # Omits git (from the distro) and mise (installs itself). neovim@latest is
-  # nightly, hence @stable. eza and revdiff come from releases via ubi.
+  # No git (from the distro) or mise (installs itself). neovim@latest is nightly.
   mise:
     core:
       - atuin@latest

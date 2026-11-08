@@ -1,4 +1,3 @@
-# eza universal Dracula
 # https://github.com/dracula/eza
 export EZA_COLORS="\
 uu=36:\

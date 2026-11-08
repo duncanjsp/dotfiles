@@ -1,20 +1,14 @@
-# Keybindings
 keybind = global:ctrl+space=toggle_quick_terminal
 
-# New terminal config
 window-inherit-working-directory = false
 working-directory = home
 
-# Quick terminal config
 quick-terminal-position = "top"
 quick-terminal-screen = "main"
 quick-terminal-animation-duration = 0.05
 
-# Nerd Font for icon/powerline glyphs.
 font-family = "{{ .font.family }}"
 font-size = {{ index .font.size .chezmoi.os }}
 
-# Visuals. Built-in themes come from `ghostty +list-themes`; anything not
-# shipped with Ghostty is vendored under themes/ alongside this file.
 theme = {{ (index .themes .theme).ghostty | quote }}
 

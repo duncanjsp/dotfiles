@@ -1,6 +1,4 @@
--- https://github.com/nvim-treesitter/nvim-treesitter
--- `main` branch: `master` is archived and crashes on Neovim 0.12 parsing
--- injections. Requires the tree-sitter CLI to build parsers.
+-- `master` is archived and crashes on Neovim 0.12 injections.
 return {
   "nvim-treesitter/nvim-treesitter",
   branch = "main",
@@ -16,10 +14,8 @@ return {
     vim.api.nvim_create_autocmd("FileType", {
       group = vim.api.nvim_create_augroup("treesitter_highlight", { clear = true }),
       callback = function(args)
-        -- Leave a buffer whose highlighter was set up by someone with more
-        -- context alone: get_lang() splits compound filetypes on the dot, so
-        -- `toml.chezmoitmpl` looks like plain toml from here and starting it
-        -- would drop the gotmpl layer config/chezmoi.lua just added.
+        -- Don't replace config/chezmoi.lua's gotmpl highlighter: get_lang()
+        -- reads `toml.chezmoitmpl` as plain toml.
         if vim.treesitter.highlighter.active[args.buf] then
           return
         end

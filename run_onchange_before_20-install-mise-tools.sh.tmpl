@@ -1,6 +1,5 @@
 {{- if eq .chezmoi.os "linux" -}}
 #!/bin/bash
-# mise rather than Homebrew: user-local, and the same on any distro.
 set -eo pipefail
 
 {{ template "lib/output.sh" . }}
