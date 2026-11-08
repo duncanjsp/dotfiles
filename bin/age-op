@@ -1,18 +1,14 @@
 #!/bin/bash
-# age wrapper that sources its decryption identity from 1Password rather than
-# from a key file on disk. Wired up via [age] command in chezmoi's config; see
-# .chezmoi.toml.tmpl. Lives in the source dir (and is listed in .chezmoiignore)
-# so it is present as soon as the repo is cloned, before any file is applied.
-#
-# Encryption is untouched: age uses --recipient for that and needs no identity.
+# age wrapper that reads the identity from 1Password. Lives in the source dir
+# so it works before anything has been applied.
 set -eo pipefail
 
 OP_REF="op://Private/Chezmoi encryption/age key/private key"
 
-# Account UUID for the stevenson-price family account.
+# stevenson-price family account
 OP_ACCOUNT="${OP_ACCOUNT:-353UNSKZKJHK5FKSKUOTREIGEA}"
 
-# Drop any --identity chezmoi passes; we supply our own on a file descriptor.
+# Drop chezmoi's --identity; ours comes in on a file descriptor.
 args=()
 skip=0
 decrypt=0

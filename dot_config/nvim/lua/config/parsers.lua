@@ -1,5 +1,4 @@
--- Treesitter parsers to keep installed. Its own module because the chezmoi
--- run_ script installs the same list headlessly, and one list is enough.
+-- Shared with run_onchange_after_30-install-nvim-tools.
 return {
   "lua",
   "vim",

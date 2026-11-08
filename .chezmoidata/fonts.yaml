@@ -1,13 +1,7 @@
-# Single source of truth for my typeface of choice to
-# avoiding having to set it everywhere.
 font:
-  # Homebrew cask for typeface installation.
   cask: font-maple-mono-nf
-  # Font family passed to the tools. Remember NerdFont
-  # varient for pretty glyphs!
   family: Maple Mono NF
-  # Linux sizes points by real DPI, macOS by a 72dpi baseline, so the same
-  # number looks bigger there. 13 is Ghostty's default.
+  # Linux sizes by real DPI, macOS by 72dpi, so the same number looks bigger.
   size:
     darwin: 13
     linux: 10

@@ -1,16 +1,13 @@
-# Set additional XDG Dirs as required
 export HISTFILE=$XDG_DATA_HOME/zsh/history
 [[ -d ${HISTFILE:h} ]] || mkdir -p ${HISTFILE:h}
 
-# Path Configuration
 {{ if eq .chezmoi.os "darwin" -}}
 export PATH="$HOME/.local/bin:/opt/homebrew/opt/node@20/bin:$PATH"
 {{- else -}}
 export PATH="$HOME/.local/bin:$PATH"
 {{- end }}
 
-# nvim for all editor invocations. VISUAL is deliberately unset: tools prefer it
-# over EDITOR, which would open Zed from the terminal. Use `zed {file}` directly.
+# VISUAL stays unset: tools prefer it over EDITOR.
 export EDITOR="nvim"
 
 # $SHELL comes from /etc/passwd, so it lies wherever chsh never ran.
@@ -24,23 +21,22 @@ export EDITOR="nvim"
 # Must come first: on Linux everything below comes from mise.
 command -v mise >/dev/null && eval "$(mise activate zsh)"
 
-# Load Atuin: https://atuin.sh/
 command -v atuin >/dev/null && eval "$(atuin init zsh)"
 
-# Load supplementary configuration files
 if [ -d "$XDG_CONFIG_HOME/zsh/resources" ]; then
 	for file in "$XDG_CONFIG_HOME/zsh/resources"/*.zsh; do
 		[ -r "$file" ] && source "$file"
 	done
 fi
 
+# After resources, so Starship wraps vi_mode.zsh's keymap widget.
 command -v starship >/dev/null && eval "$(starship init zsh)"
 
 autoload -U compinit && compinit
-export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
-export CARAPACE_MATCH=1                                # case-insensitive completion
+export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
+export CARAPACE_MATCH=1 # case-insensitive
 zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # case-insensitive fallback for non-carapace completions
-zstyle ':completion:*' menu select                     # menu selection
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # color completion
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' menu select
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 command -v carapace >/dev/null && source <(carapace _carapace)

@@ -5,7 +5,7 @@ opt.relativenumber = true
 opt.clipboard = "unnamedplus"
 opt.mouse = "a"
 
--- Real tabs, 4 wide. Global fallback; .editorconfig and formatters override.
+-- Fallback only; .editorconfig and formatters override.
 opt.expandtab = false
 opt.tabstop = 4
 opt.shiftwidth = 4
@@ -25,11 +25,9 @@ opt.splitbelow = true
 opt.updatetime = 250
 opt.showmode = false
 
--- blink.cmp draws the LSP menu; this governs the built-in completions that
--- remain, such as <C-x><C-f> and the command line.
+-- Built-in completion only (<C-x><C-f>, cmdline); blink.cmp draws LSP's.
 opt.completeopt = { "menu", "menuone", "noselect", "popup", "fuzzy" }
 
--- Fold via Treesitter, open by default.
 opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldlevel = 99

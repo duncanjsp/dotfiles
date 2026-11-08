@@ -1,4 +1,3 @@
--- https://github.com/stevearc/conform.nvim
 return {
   "stevearc/conform.nvim",
   event = { "BufWritePre" },
@@ -31,9 +30,7 @@ return {
       bash = { "shfmt" },
       ["_"] = { "trim_whitespace" },
     },
-    -- A chezmoi template is not valid in its target language, so shfmt and
-    -- friends either refuse it or mangle the `{{ }}`. See config/chezmoi.lua
-    -- for where that filetype suffix comes from.
+    -- Formatters mangle chezmoi templates' `{{ }}`.
     format_on_save = function(bufnr)
       if vim.bo[bufnr].filetype:find("chezmoitmpl", 1, true) then
         return nil

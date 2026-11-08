@@ -1,5 +1,4 @@
--- SchemaStore.nvim supplies the catalogue, so yamlls' own fetcher is off to
--- stop the two disagreeing about which schema applies.
+-- Off so SchemaStore.nvim is the only schema source.
 ---@type vim.lsp.Config
 return {
   settings = {

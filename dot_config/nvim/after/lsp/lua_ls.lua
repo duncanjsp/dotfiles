@@ -1,5 +1,4 @@
--- Formatting is stylua's job (see conform.lua); lazydev.nvim supplies the
--- Neovim API library, so there is no workspace config to do here.
+-- conform formats with stylua.
 ---@type vim.lsp.Config
 return {
   settings = {

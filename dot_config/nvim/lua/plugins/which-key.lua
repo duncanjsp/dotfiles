@@ -1,4 +1,3 @@
--- https://github.com/folke/which-key.nvim
 return {
   "folke/which-key.nvim",
   event = "VeryLazy",
@@ -18,10 +17,9 @@ return {
       delay = 200,
     })
 
-    -- Group labels + docs for built-ins so they show in the cheat sheet.
     wk.add({
       { "<leader>f", group = "find" },
-      -- The LSP members of this group are added per-buffer on attach.
+      -- LSP members are added per buffer on attach.
       { "<leader>c", group = "code" },
       { "]d", desc = "Next diagnostic" },
       { "[d", desc = "Previous diagnostic" },

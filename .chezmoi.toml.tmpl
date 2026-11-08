@@ -1,6 +1,4 @@
-{{- /* Three axes: profile (personal|work), .chezmoi.os, and gui. A server is
-       Linux with gui = false rather than a profile of its own. Unknown hosts
-       default to gui = false so a scripted bootstrap is safe. */ -}}
+{{- /* Unknown hosts default to gui = false so a scripted bootstrap is safe. */ -}}
 {{- $profile := "personal" -}}
 {{- $gui := true -}}
 {{- if eq .chezmoi.hostname "test-track" -}}
@@ -17,7 +15,6 @@ email = {{ $email | quote }}
 profile = {{ $profile | quote }}
 gui = {{ $gui }}
 
-# No identity on disk: bin/age-op fetches the key from 1Password at decrypt time.
 [age]
 command = {{ (joinPath .chezmoi.sourceDir "bin/age-op") | quote }}
 recipient = "age13maate0garz665d5le655t2vdctuwz4s8plfnu0xpjvwkmhmhe3sxvdgwe"
