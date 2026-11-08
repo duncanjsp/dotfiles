@@ -5,7 +5,7 @@
 {{-   $settings = fromJson .chezmoi.stdin -}}
 {{- end -}}
 
-{{- $settings = setValueAtPath "model" "opus" $settings -}}
+{{- $settings = setValueAtPath "model" "sonnet" $settings -}}
 {{- $settings = setValueAtPath "effortLevel" "high" $settings -}}
 {{- $settings = setValueAtPath "theme" "dark" $settings -}}
 {{- $settings = setValueAtPath "statusLine" (dict
