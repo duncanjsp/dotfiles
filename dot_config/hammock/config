@@ -1,0 +1,21 @@
+# Hammock config (Ghostty syntax). Changes apply automatically.
+#   appearance = auto | light | dark
+#   theme = dark:NAME,light:NAME   (Ghostty theme files; see Settings ▸ Appearance)
+#   font-family = NAME, font-size = 15, font-thicken = false
+#   cursor-style = block | bar | bar_thin | underline | block_hollow, cursor-style-blink = true
+#   copy-on-select = false
+#   tui-animations = true          (hmk tui: false snaps instead of animating)
+theme = dark:Catppuccin Mocha,light:Catppuccin Latte
+appearance = dark
+tab-status = trailing
+screen-sharing = true
+adjust-cell-height = -15%
+font-size = 12
+app-theme = custom
+agent-color = Forest
+window-theme = Match Terminal
+sidebar-opacity = 1.00
+copy-on-select = true
+keybind = cmd+/=toggle_sidebar
+active-pane-border = true
+pane-spacing = spacious

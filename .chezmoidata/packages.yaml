@@ -8,12 +8,11 @@ packages:
     - eza
     - fastfetch
     - fd
+    - fish
     - gh
     - git
     - go
     - gum
-    - herdr
-    - jandedobbeleer/oh-my-posh/oh-my-posh
     - jj
     - jq
     - mise
@@ -22,6 +21,7 @@ packages:
     - prettier
     - ripgrep
     - rust
+    - starship
     - stylua
     # Used directly by nvim-treesitter, not just as a neovim dependency.
     - tree-sitter
@@ -47,12 +47,11 @@ packages:
       - neovim@stable
       - node@latest
       - npm:prettier@latest
-      - oh-my-posh@latest
       - ripgrep@latest
+      - starship@latest
       - stylua@latest
       - tree-sitter@latest
       - ubi:eza-community/eza@latest
       - ubi:umputun/revdiff@latest
     gui:
-      - herdr@latest
       - rust@latest

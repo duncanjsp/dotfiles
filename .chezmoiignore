@@ -2,15 +2,23 @@ README.md
 bin
 {{ if ne .profile "work" }}
 .config/zsh/resources/work.zsh
+.config/fish/functions/assume.fish
+.config/fish/conf.d/work.fish
 {{ end }}
 {{ if ne .profile "personal" }}
 .config/zsh/resources/personal.zsh
+.config/fish/conf.d/personal.fish
 {{ end }}
 {{ if not .gui }}
-.config/ghostty
-.config/herdr
-.config/native-shortcuts-herd
+.config/fish
+.config/rex
 .config/zed
+{{ end }}
+{{ if or (not .gui) (ne .chezmoi.os "linux") }}
+.config/ghostty
+{{ end }}
+{{ if or (not .gui) (ne .chezmoi.os "darwin") }}
+.config/hammock
 {{ end }}
 {{ if ne .chezmoi.os "linux" }}
 .bash_profile

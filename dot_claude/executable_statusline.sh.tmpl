@@ -5,7 +5,7 @@
 # back on stdout. Absent fields drop their segment rather than rendering a
 # zero, which is what lets one script serve both machines unchanged.
 #
-# Colours come from .chezmoidata/theme.yaml, the palette oh-my-posh reads.
+# Colours come from the palette in .chezmoidata/theme.yaml.
 # Touch ~/.claude/.statusline-debug to dump payloads per session.
 
 set -uo pipefail
@@ -43,7 +43,7 @@ c_reset=$'\033[0m'
 
 # jj before git, deliberately: colocation parks .git/HEAD on a bare commit, so
 # reading it reports a SHA where the bookmark is the useful name. Same
-# precedence the prompt uses via oh-my-posh's disable_with_jj.
+# precedence the prompt uses via Starship's vcs.order.
 vcs_kind="" vcs_name="" vcs_rev_pre="" vcs_rev_suf="" vcs_ahead=0
 while [[ -n $probe && $probe != / ]]; do
   if [[ -d $probe/.jj ]]; then
