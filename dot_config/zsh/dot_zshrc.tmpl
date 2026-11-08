@@ -17,23 +17,12 @@ export EDITOR="nvim"
 [[ -n "${commands[zsh]}" ]] && export SHELL="${commands[zsh]}"
 
 {{ if ne .chezmoi.os "darwin" -}}
-# Not .zprofile: herdr's panes are non-login on Linux and never read it.
+# Not .zprofile: multiplexer panes are often non-login and never read it.
 [ -x /home/linuxbrew/.linuxbrew/bin/brew ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 {{ end -}}
 # Must come first: on Linux everything below comes from mise.
 command -v mise >/dev/null && eval "$(mise activate zsh)"
-{{ if .gui }}
-# After mise, which provides herdr on Linux. Unguarded, a failed exec of a
-# missing command exits zsh outright rather than reaching `|| exit`.
-# Auto-launch herdr only when stdin is a TTY, not already inside herdr, not
-# over SSH, not in Ghostty's quick terminal, and not in Fika.
-if [[ -t 0 && -z "$HERDR_ENV" && -z "$SSH_CONNECTION" && "$GHOSTTY_QUICK_TERMINAL" != "1" && "$TERM_PROGRAM" != "Fika" ]] && command -v herdr >/dev/null; then
-	exec herdr || exit
-fi
-{{ end }}
-# OhMyPosh Config https://ohmyposh.dev/docs/
-command -v oh-my-posh >/dev/null && eval "$(oh-my-posh init zsh --config $XDG_CONFIG_HOME/ohmyposh/config.toml)"
 
 # Load Atuin: https://atuin.sh/
 command -v atuin >/dev/null && eval "$(atuin init zsh)"
@@ -45,6 +34,8 @@ if [ -d "$XDG_CONFIG_HOME/zsh/resources" ]; then
 	done
 fi
 
+command -v starship >/dev/null && eval "$(starship init zsh)"
+
 autoload -U compinit && compinit
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
 export CARAPACE_MATCH=1                                # case-insensitive completion
@@ -53,7 +44,3 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # case-insensitive fallba
 zstyle ':completion:*' menu select                     # menu selection
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # color completion
 command -v carapace >/dev/null && source <(carapace _carapace)
-
-# `|| true` keeps $? at 0 for the first prompt: this is the last line of the
-# file, so a skipped fastfetch would otherwise show as an error in the prompt.
-command -v fastfetch >/dev/null && fastfetch || true

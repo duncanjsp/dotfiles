@@ -11,7 +11,7 @@ Every conditional keys off exactly one of them:
 | ------------- | -------------------- | ----------------------------------------------------- |
 | `profile`     | `personal` / `work`  | git identity, signing key, work remotes, encrypted blob |
 | `.chezmoi.os` | `darwin` / `linux`   | package manager, platform binary paths                 |
-| `gui`         | `true` / `false`     | Ghostty, herdr, Zed, commit signing                    |
+| `gui`         | `true` / `false`     | Rex, Hammock, Ghostty (Linux), Zed, commit signing     |
 
 Which gives:
 
@@ -77,14 +77,13 @@ those two values and `chezmoi apply` to switch typeface everywhere.
 
 `.chezmoidata/theme.yaml` holds a `theme` selector and a `themes` table. Point
 the selector at another key in the table, `chezmoi apply`, and Ghostty, bat,
-herdr, Zed, Neovim, the oh-my-posh palette and the Claude Code status line all
-follow.
+Zed, Neovim and the Claude Code status line all follow.
 
 Each theme entry carries whatever each tool needs, because none of them agree
-on naming: Ghostty and Zed want `Catppuccin Mocha`, herdr wants `catppuccin`,
-Neovim wants a plugin path and a flavour, and oh-my-posh wants raw hex.
+on naming: Ghostty and Zed want `Catppuccin Mocha`, Neovim wants a plugin path
+and a flavour, and the status line wants raw hex.
 
-The oh-my-posh palette is keyed by role — `accent`, `path`, `ok`, `warn`,
+The status line palette is keyed by role — `accent`, `path`, `ok`, `warn`,
 `error` — rather than by hue, so a theme can put any colour behind any role.
 One rule holds across every theme: a coloured background always pairs with
 `fg_on_accent`, and a transparent background always takes a light accent as
@@ -114,8 +113,8 @@ The exception is the revision, which no payload field carries, so the script
 walks up from the working directory looking for one. `.jj` is checked before
 `.git`, deliberately: in a colocated repo `.git/HEAD` sits on a bare commit
 permanently, so reading it reports a SHA where the bookmark is the useful
-thing. That is the same precedence the prompt uses via oh-my-posh's
-`disable_with_jj`. The revset is `heads(::@ & bookmarks())` — `heads` rather
+thing. That is the same precedence the prompt uses via Starship's
+`vcs.order`. The revset is `heads(::@ & bookmarks())` — `heads` rather
 than `latest` so an ambiguous history reports every equidistant bookmark
 instead of silently choosing one.
 
@@ -146,7 +145,7 @@ that the percentage is the whole story and the time is noise. The countdown
 floors rather than rounds, so it understates by up to a minute, which is the
 right direction for time remaining.
 
-Colours follow the same role-keyed palette as the prompt. The status line draws
+Colours follow the role-keyed palette in `theme.yaml`. The status line draws
 on a transparent background throughout, so every role resolves to a light
 accent, per the invariant above. `theme.yaml` stores hex and terminals want
 24-bit ANSI, so the script converts with bash arithmetic — a builtin, costing

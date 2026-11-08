@@ -1,6 +1,6 @@
 # Single source of truth for the colour scheme. Point `theme` at any key in
-# `themes` and re-apply: Ghostty, bat, herdr, Zed, Neovim and the oh-my-posh
-# palette all follow from that one line.
+# `themes` and re-apply: Ghostty, bat, Zed, Neovim and the Claude Code status
+# line palette all follow from that one line.
 #
 # eza, fastfetch and atuin are deliberately absent. They render in terminal
 # ANSI, so they inherit whatever Ghostty's theme sets and need no config.
@@ -9,10 +9,9 @@ theme: catppuccin-mocha
 themes:
   catppuccin-mocha:
     # Built into Ghostty and bat already; `ghostty +list-themes`, `bat
-    # --list-themes`. herdr's built-in name has no flavour suffix.
+    # --list-themes`.
     ghostty: Catppuccin Mocha
     bat: Catppuccin Mocha
-    herdr: catppuccin
     zed:
       name: Catppuccin Mocha
       # Zed installs this itself on launch via auto_install_extensions.
@@ -24,7 +23,7 @@ themes:
       module: catppuccin
       colorscheme: catppuccin
       flavour: mocha
-    # oh-my-posh slots are keyed by role, not by hue, so a theme is free to
+    # Status line slots are keyed by role, not by hue, so a theme is free to
     # pick whatever colour suits a role. One invariant holds across every
     # theme: coloured backgrounds always pair with fg_on_accent, and
     # transparent backgrounds always take a light accent as their foreground.
@@ -47,7 +46,6 @@ themes:
     # falls back to the free Dracula.
     ghostty: dracula-pro
     bat: Dracula
-    herdr: dracula
     zed:
       name: Dracula Pro
       extension: ""
