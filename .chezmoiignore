@@ -4,6 +4,7 @@ bin
 .config/zsh/resources/work.zsh
 .config/fish/functions/assume.fish
 .config/fish/conf.d/work.fish
+.config/fish/conf.d/nix.fish
 {{ end }}
 {{ if ne .profile "personal" }}
 .config/zsh/resources/personal.zsh
