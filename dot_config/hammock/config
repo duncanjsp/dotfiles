@@ -19,3 +19,6 @@ copy-on-select = true
 keybind = cmd+/=toggle_sidebar
 active-pane-border = true
 pane-spacing = spacious
+group-headings = subtle
+group-icons = false
+program-icons = colorful
