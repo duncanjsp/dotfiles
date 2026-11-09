@@ -29,13 +29,13 @@ chezmoi update
 
 macOS, via Homebrew:
 
-- atuin, bat, carapace, chezmoi, direnv, eza, fastfetch, fd, fish, gh, git, go, gum, jj, jq, mise, neovim, node@20, prettier, revdiff, ripgrep, rust, starship, stylua, tree-sitter
+- atuin, bat, carapace, chezmoi, direnv, eza, fastfetch, fd, fish, gh, git, go, gum, jj, jq, mise, neovim, prettier, revdiff, ripgrep, rust, starship, stylua, tree-sitter
 - 1password-cli
 - Maple Mono NF
 
 Linux, via mise:
 
-- atuin, bat, carapace, chezmoi, direnv, eza, fastfetch, fd, gh, go, gum, jj, jq, neovim, node, prettier, revdiff, ripgrep, starship, stylua, tree-sitter
+- atuin, bat, carapace, chezmoi, direnv, eza, fastfetch, fd, gh, go, gum, jj, jq, neovim, prettier, revdiff, ripgrep, starship, stylua, tree-sitter
 - GUI machines also: rust, Maple Mono NF
 - Via the system package manager, if missing: make, gcc, zsh
 

@@ -2,7 +2,7 @@ export HISTFILE=$XDG_DATA_HOME/zsh/history
 [[ -d ${HISTFILE:h} ]] || mkdir -p ${HISTFILE:h}
 
 {{ if eq .chezmoi.os "darwin" -}}
-export PATH="$HOME/.local/bin:/opt/homebrew/opt/node@20/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 {{- else -}}
 export PATH="$HOME/.local/bin:$PATH"
 {{- end }}

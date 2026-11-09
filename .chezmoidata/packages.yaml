@@ -17,7 +17,6 @@ packages:
     - jq
     - mise
     - neovim
-    - node@20
     - prettier
     - ripgrep
     - rust

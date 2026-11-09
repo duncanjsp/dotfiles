@@ -9,7 +9,7 @@ switch (uname)
         set -q TMPDIR; and set tmp $TMPDIR
         set -gx XDG_RUNTIME_DIR (string trim -r -c / -- $tmp)/xdg-runtime-(id -u)
         /opt/homebrew/bin/brew shellenv fish | source
-        fish_add_path --global --move --path $HOME/.local/bin /opt/homebrew/opt/node@20/bin
+        fish_add_path --global --move --path $HOME/.local/bin
     case '*'
         set -gx XDG_RUNTIME_DIR /run/user/(id -u)
         if contains -- "$LANG" "" C POSIX
