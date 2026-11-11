@@ -20,5 +20,9 @@ keybind = cmd+/=toggle_sidebar
 active-pane-border = true
 pane-spacing = spacious
 group-headings = subtle
-group-icons = false
 program-icons = colorful
+usage-limits-claude = true
+font-family = Maple Mono NF
+usage-live-agents = claude
+group-icons = false
+editor-wrap = true
